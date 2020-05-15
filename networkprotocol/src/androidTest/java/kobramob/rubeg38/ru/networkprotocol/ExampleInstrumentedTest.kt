@@ -1,4 +1,4 @@
-package rubeg38.myalarmbutton
+package kobramob.rubeg38.ru.networkprotocol
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("rubeg38.myalarmbutton", appContext.packageName)
+        assertEquals("kobramob.rubeg38.ru.networkprotocol.test", appContext.packageName)
     }
 }

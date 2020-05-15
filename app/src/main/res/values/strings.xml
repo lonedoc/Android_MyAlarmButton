@@ -1,3 +1,9 @@
 <resources>
-    <string name="app_name">MyAlarmButton</string>
+    <string name="app_name">Кобра МТК</string>
+
+    //login text
+    <string name="change_town">Выберите город:</string>
+    <string name="changePSC">Выберите ЧОП:</string>
+
+
 </resources>
