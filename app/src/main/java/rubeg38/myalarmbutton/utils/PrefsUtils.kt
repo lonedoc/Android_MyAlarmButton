@@ -31,13 +31,6 @@ class PrefsUtils(context:Context): Preferences {
             editor.putInt("port", value).apply()
         }
 
-    override var imei: String?
-        get() = prefs.getString("imei", null)
-        set(value) {
-            val editor = prefs.edit()
-            editor.putString("imei", value).apply()
-        }
-
     override var fcmtoken: String?
         get() = prefs.getString("fcmtoken", null)
         set(value) {
@@ -45,26 +38,21 @@ class PrefsUtils(context:Context): Preferences {
             editor.putString("fcmtoken", value).apply()
         }
 
-    override var version:String?
-        get() = prefs.getString("version",null)
-        set(value) {
-            val editor = prefs.edit()
-            editor.putString("version",value).apply()
-        }
 
-    override var login:String?
-        get() = prefs.getString("login",null)
+    override var phone:String?
+        get() = prefs.getString("phone",null)
         set(value){
             val editor = prefs.edit()
-            editor.putString("login",value).apply()
+            editor.putString("phone",value).apply()
         }
 
-    override var password:String?
-        get() = prefs.getString("password",null)
+    override var token: String?
+        get() = prefs.getString("token",null)
         set(value){
             val editor = prefs.edit()
-            editor.putString("password",value).apply()
+            editor.putString("token",value).apply()
         }
+
 
     override val containsAddress: Boolean
         get() = prefs.contains("ip")
@@ -72,15 +60,14 @@ class PrefsUtils(context:Context): Preferences {
     override val containsPort: Boolean
         get() = prefs.contains("port")
 
-    override val containsImei: Boolean
-        get() = prefs.contains("imei")
+    override val containsToken: Boolean
+        get() = prefs.contains("token")
+
 
     override val containsFcmToken: Boolean
         get() = prefs.contains("fcmtoken")
 
-    override val containsLogin:Boolean
-        get() = prefs.contains("login")
+    override val containsPhone:Boolean
+        get() = prefs.contains("phone")
 
-    override val containsPassword:Boolean
-        get() = prefs.contains("password")
 }

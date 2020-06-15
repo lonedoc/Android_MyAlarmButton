@@ -243,15 +243,6 @@ class RubegProtocol {
             while (started) {
 //                readLoopSemaphore.acquire()
 
-                if (lastResponseTime + CONNECTION_DROP_INTERVAL <= System.currentTimeMillis()) {
-                    lastResponseTime = System.currentTimeMillis()
-
-                    reset()
-
-                    connectionWatchers.forEach { it?.onConnectionLost() }
-
-                    currentHostIndex++
-                }
 
                 var buffer = ByteBuffer.allocate(1536)
 
@@ -344,10 +335,17 @@ class RubegProtocol {
                 failedTransmissions.forEach { transmission ->
                     val messageNumber = transmission.packet.headers.messageNumber
 
+                    reset()
+
+                    connectionWatchers.forEach { it?.onConnectionLost() }
+
+                    currentHostIndex++
+
+             /*       //TODO теперь вот тут надо отключать протокол
                     packetsQueue.removeAll { it.headers.messageNumber == messageNumber }
 
                     outcomingTransmissions[messageNumber]?.onComplete?.invoke(false)
-                    outcomingTransmissions.remove(messageNumber)
+                    outcomingTransmissions.remove(messageNumber)*/
                 }
 
                 congestionWindow.removeAll { it.attemptsCount > MAX_ATTEMPTS_COUNT }
@@ -384,7 +382,7 @@ class RubegProtocol {
                     }
                 }
 
-                // Maintain connection
+              /*  // Maintain connection
                 val syncTimeHasCome = lastRequestTime + SYNC_INTERVAL <= System.currentTimeMillis()
 
                 if (syncTimeHasCome) {
@@ -397,7 +395,7 @@ class RubegProtocol {
                             ex.printStackTrace()
                         }
                     }
-                }
+                }*/
 
                 if (packetsQueueIsEmpty)
                     sleep(SLEEP_INTERVAL)

@@ -7,16 +7,22 @@ import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import com.redmadrobot.inputmask.MaskedTextChangedListener
 import kotlinx.android.synthetic.main.activity_login.*
 import moxy.MvpAppCompatActivity
 import moxy.presenter.InjectPresenter
 import rubeg38.myalarmbutton.R
 import rubeg38.myalarmbutton.presenеtation.presenter.login.LoginPresenter
 import rubeg38.myalarmbutton.presenеtation.view.login.LoginView
+import rubeg38.myalarmbutton.ui.password.DialogPassword
+import rubeg38.myalarmbutton.utils.PrefsUtils
 import rubeg38.myalarmbutton.utils.data.CityList
 import rubeg38.myalarmbutton.utils.data.ListOfOrganizations
+import rubeg38.myalarmbutton.utils.interfaces.RegistrationCallback
+import rubeg38.myalarmbutton.utils.models.setOnFocusChanged
+import rubeg38.myalarmbutton.utils.models.setOnTextChanged
 
-class LoginActivity:MvpAppCompatActivity(),LoginView {
+class LoginActivity:MvpAppCompatActivity(),LoginView,RegistrationCallback {
     @InjectPresenter
     lateinit var presenter:LoginPresenter
 
@@ -24,13 +30,58 @@ class LoginActivity:MvpAppCompatActivity(),LoginView {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        password_request.setOnClickListener { presenter.passwordRequest() }
+        passwordRequest.setOnClickListener { presenter.passwordRequest(phoneEditText.text.toString()) }
+
+        phoneEditText.setOnTextChanged { str -> presenter.validatePhone(str.toString()) }
+
+        phoneEditText.setOnFocusChanged{ _,hasFocus ->
+            val phone = phoneEditText.text.toString()
+            if(hasFocus) presenter.validatePhone(phone)
+        }
+
+        initPhoneMask()
+    }
+
+    private fun initPhoneMask() {
+        val listener = MaskedTextChangedListener(
+            "+7 ([000]) [000] [00] [00]",
+            phoneEditText
+        )
+        phoneEditText.addTextChangedListener(listener)
+        phoneEditText.onFocusChangeListener = listener
+
     }
 
     override fun onStart() {
         super.onStart()
         Log.d("Model", Build.MODEL)
+        val preferences = PrefsUtils(this)
+        presenter.init(preferences)
     }
+
+    override fun setPhone(phone: String) {
+        phoneEditText.setText(phone)
+    }
+
+    override fun errorDialog() {
+        val error = AlertDialog.Builder(this)
+        error.setTitle("Ошибка")
+            .setMessage("Номер введен не корректно")
+            .setPositiveButton("Закрыть"){ dialog, _ ->
+                dialog.cancel()
+            }
+            .create().show()
+    }
+
+    override fun setErrorPhoneEditText(message: String?) {
+        textinput_error.error = message
+    }
+
+    override fun showPasswordDialog() {
+        val passwordDialog = DialogPassword.newInstance(this)
+        passwordDialog.show(supportFragmentManager,"PasswordDialog")
+    }
+
     override fun openNoConnectionToTheCityServer() {
         AlertDialog.Builder(this)
             .setTitle("Ошибка")
@@ -96,6 +147,16 @@ class LoginActivity:MvpAppCompatActivity(),LoginView {
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
         }
+    }
+
+    override fun sendRegistration(password:String) {
+        val phone = phoneEditText.text.toString()
+        val model = Build.MODEL
+        presenter.sendRegistration(phone,password,model)
+    }
+
+    override fun cancelRegistration() {
+        //TODO сделать отмену регистрации если пароль не пришел
     }
 
 }

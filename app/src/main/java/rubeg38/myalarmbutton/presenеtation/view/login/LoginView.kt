@@ -12,5 +12,13 @@ interface LoginView:MvpView {
 
     @StateStrategyType(value = SkipStrategy::class)
     fun initSpinnerTown(cityList: ArrayList<CityList>)
+    @StateStrategyType(value = SkipStrategy::class)
+    fun setPhone(phone: String)
+    @StateStrategyType(value = SkipStrategy::class)
+    fun errorDialog()
+    @StateStrategyType(value = SkipStrategy::class)
+    fun setErrorPhoneEditText(message: String?)
+    @StateStrategyType(value = SkipStrategy::class)
+    fun showPasswordDialog()
 
 }

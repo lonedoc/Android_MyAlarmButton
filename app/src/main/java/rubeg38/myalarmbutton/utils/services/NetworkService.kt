@@ -1,4 +1,4 @@
-package rubeg38.myalarmbutton.utils.servicess
+package rubeg38.myalarmbutton.utils.services
 
 import android.app.Service
 import android.content.Intent

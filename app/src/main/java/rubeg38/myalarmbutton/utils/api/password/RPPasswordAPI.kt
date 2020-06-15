@@ -1,6 +1,8 @@
 package rubeg38.myalarmbutton.utils.api.password
 
 import android.util.Log
+import com.google.gson.JsonObject
+import org.json.JSONObject
 import ru.rubeg38.rubegprotocol.TextMessageWatcher
 import rubegprotocol.RubegProtocol
 
@@ -10,18 +12,22 @@ class RPPasswordAPI(
     override var onPasswordListener: OnPasswordListener? = null
     private var unsubscribe = protocol.subscribe(this as TextMessageWatcher)
 
-    override fun sendPasswordRequest(complete: (Boolean) -> Unit) {
-        val message = "{\"\$c$\":\"getpassword\",\"phone\":\"9041472887\"}"
+    override fun sendPasswordRequest(phone:String,complete: (Boolean) -> Unit) {
 
-        protocol.send(message){
-            if (it)
-                Log.d("Password","get")
-            else
-                Log.d("Password","notGet")
+        val message = JSONObject()
+        message.put("\$c$", "getpassword")
+        message.put("phone",phone)
+        Log.d("Reg",message.toString())
+        protocol.send(message.toString()){
         }
     }
 
     override fun onTextMessageReceived(message: String) {
+        if(JSONObject(message).getString("\$c$") == "getpassword")
         onPasswordListener?.onPasswordDataReceived(message)
+    }
+
+    override fun onDestroy() {
+        unsubscribe()
     }
 }
