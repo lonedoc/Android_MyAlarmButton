@@ -20,5 +20,8 @@ interface LoginView:MvpView {
     fun setErrorPhoneEditText(message: String?)
     @StateStrategyType(value = SkipStrategy::class)
     fun showPasswordDialog()
-
+    @StateStrategyType(value = SkipStrategy::class)
+    fun startService(ipList: java.util.ArrayList<String>)
+    @StateStrategyType(value = SkipStrategy::class)
+    fun openMainActivity()
 }

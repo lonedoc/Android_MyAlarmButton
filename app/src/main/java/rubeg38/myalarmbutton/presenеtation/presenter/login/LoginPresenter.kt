@@ -25,6 +25,7 @@ class LoginPresenter: OnAuthListener,OnPasswordListener,MvpPresenter<LoginView>(
     lateinit var nameOfOrganization: String
     var passwordAPI: PasswordAPI? = null
     var authAPI:AuthAPI? = null
+    var preferences:PrefsUtils? = null
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
         thread{
@@ -42,6 +43,7 @@ class LoginPresenter: OnAuthListener,OnPasswordListener,MvpPresenter<LoginView>(
     }
 
     fun init(preferences: PrefsUtils) {
+        this.preferences = preferences
         val phone = preferences.phone
         if(phone!=null)
             viewState.setPhone(phone)
@@ -128,13 +130,9 @@ class LoginPresenter: OnAuthListener,OnPasswordListener,MvpPresenter<LoginView>(
             .replace(") ", "")
             .replace(" ", "")
 
+        viewState.startService(ipList)
+
         val protocol = RubegProtocol.sharedInstance
-
-        if(protocol.isStarted)
-            protocol.stop()
-
-        protocol.configure(ipList,9010)
-        protocol.start()
 
         if(authAPI!= null) authAPI?.onDestroy()
 
@@ -153,11 +151,15 @@ class LoginPresenter: OnAuthListener,OnPasswordListener,MvpPresenter<LoginView>(
         }
     }
 
-    override fun onAuthDataReceived(message: String) {
-        Log.d("Auth",message)
+    override fun onAuthDataReceived(token: String) {
         val protocol = RubegProtocol.sharedInstance
 
-        if(protocol.isStarted)
-            protocol.stop()
+        preferences?.token = token
+        preferences?.serverAddress = ipList
+        preferences?.serverPort = 9010
+
+        protocol.token = token
+
+        viewState.openMainActivity()
     }
 }

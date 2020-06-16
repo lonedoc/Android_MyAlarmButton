@@ -23,7 +23,7 @@ class RPPasswordAPI(
     }
 
     override fun onTextMessageReceived(message: String) {
-        if(JSONObject(message).getString("\$c$") == "getpassword")
+        if(JSONObject(message).getString("\$c$") != "getpassword") return
         onPasswordListener?.onPasswordDataReceived(message)
     }
 

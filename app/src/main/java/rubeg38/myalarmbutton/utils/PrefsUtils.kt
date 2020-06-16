@@ -5,7 +5,7 @@ import android.content.SharedPreferences
 import rubeg38.myalarmbutton.utils.models.Preferences
 
 class PrefsUtils(context:Context): Preferences {
-    private val prefsId = "ru.rubeg38.myalarmbutton"
+    private val prefsId = "myalarmbutton.DataStorage"
     private val prefs: SharedPreferences = context.getSharedPreferences(prefsId, Context.MODE_PRIVATE)
 
     override var serverAddress: ArrayList<String>

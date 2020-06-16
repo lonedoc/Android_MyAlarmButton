@@ -1,8 +1,10 @@
 package rubeg38.myalarmbutton.utils.api.auth
 
 import android.util.Log
+import com.google.gson.Gson
 import org.json.JSONObject
 import ru.rubeg38.rubegprotocol.TextMessageWatcher
+import rubeg38.myalarmbutton.utils.data.Auth
 import rubegprotocol.RubegProtocol
 
 class RPAuthAPI(
@@ -29,11 +31,16 @@ class RPAuthAPI(
     }
 
     override fun onTextMessageReceived(message: String) {
-        if(JSONObject(message).getString("\$c$") == "regok")
-        onAuthListener?.onAuthDataReceived(message)
+
+        if(JSONObject(message).getString("\$c$") != "regok") return
+
+        val gson = Gson()
+        val auth = gson.fromJson(message, Auth::class.java)
+        onAuthListener?.onAuthDataReceived(auth.token)
     }
 
     override fun onDestroy() {
         unsubscribe()
     }
+
 }

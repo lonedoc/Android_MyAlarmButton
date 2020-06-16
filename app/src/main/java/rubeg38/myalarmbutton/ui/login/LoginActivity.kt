@@ -1,6 +1,7 @@
 package rubeg38.myalarmbutton.ui.login
 
 import android.app.AlertDialog
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -21,6 +22,7 @@ import rubeg38.myalarmbutton.utils.data.ListOfOrganizations
 import rubeg38.myalarmbutton.utils.interfaces.RegistrationCallback
 import rubeg38.myalarmbutton.utils.models.setOnFocusChanged
 import rubeg38.myalarmbutton.utils.models.setOnTextChanged
+import rubeg38.myalarmbutton.utils.services.NetworkService
 
 class LoginActivity:MvpAppCompatActivity(),LoginView,RegistrationCallback {
     @InjectPresenter
@@ -81,6 +83,14 @@ class LoginActivity:MvpAppCompatActivity(),LoginView,RegistrationCallback {
         val passwordDialog = DialogPassword.newInstance(this)
         passwordDialog.show(supportFragmentManager,"PasswordDialog")
     }
+
+    override fun startService(ipList: java.util.ArrayList<String>) {
+        val service = Intent(this,NetworkService::class.java)
+        service.putStringArrayListExtra("ipList",ipList)
+        startService(service)
+    }
+
+    override fun openMainActivity(){}
 
     override fun openNoConnectionToTheCityServer() {
         AlertDialog.Builder(this)
