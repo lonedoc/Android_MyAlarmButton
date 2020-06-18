@@ -1,4 +1,6 @@
 package rubeg38.myalarmbutton.presenеtation.view.main
 
-interface MainView {
+import moxy.MvpView
+
+interface MainView:MvpView {
 }

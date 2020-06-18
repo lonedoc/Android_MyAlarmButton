@@ -15,6 +15,7 @@ import moxy.presenter.InjectPresenter
 import rubeg38.myalarmbutton.R
 import rubeg38.myalarmbutton.presenеtation.presenter.login.LoginPresenter
 import rubeg38.myalarmbutton.presenеtation.view.login.LoginView
+import rubeg38.myalarmbutton.ui.main.MainActivity
 import rubeg38.myalarmbutton.ui.password.DialogPassword
 import rubeg38.myalarmbutton.utils.PrefsUtils
 import rubeg38.myalarmbutton.utils.data.CityList
@@ -81,6 +82,7 @@ class LoginActivity:MvpAppCompatActivity(),LoginView,RegistrationCallback {
 
     override fun showPasswordDialog() {
         val passwordDialog = DialogPassword.newInstance(this)
+        passwordDialog.isCancelable = false
         passwordDialog.show(supportFragmentManager,"PasswordDialog")
     }
 
@@ -90,7 +92,10 @@ class LoginActivity:MvpAppCompatActivity(),LoginView,RegistrationCallback {
         startService(service)
     }
 
-    override fun openMainActivity(){}
+    override fun openMainActivity(){
+        val main = Intent(this,MainActivity::class.java)
+        startActivity(main)
+    }
 
     override fun openNoConnectionToTheCityServer() {
         AlertDialog.Builder(this)
@@ -166,7 +171,15 @@ class LoginActivity:MvpAppCompatActivity(),LoginView,RegistrationCallback {
     }
 
     override fun cancelRegistration() {
-        //TODO сделать отмену регистрации если пароль не пришел
+        val errorPasswordDialog = AlertDialog.Builder(this)
+        errorPasswordDialog.setTitle("Отмена регистрации")
+            .setMessage("Проверьте правильность данных введеных вами, если все верно, обратитесь в ЧОП за подробной информацией о вашей учетной записи")
+            .setPositiveButton("Закрыть"){
+                dialog, which ->
+                dialog.cancel()
+            }
+            .create()
+            .show()
     }
 
 }

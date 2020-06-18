@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     //color app
-    <color name="colorPrimary">#6200EE</color>
-    <color name="colorPrimaryDark">#3700B3</color>
-    <color name="colorAccent">#03DAC5</color>
+    <color name="colorPrimary">#4caf50</color>
+    <color name="colorPrimaryDark">#087f23</color>
+    <color name="colorAccent">#2196f3</color>
 
     //color text
     <color name="colorTextDark">#000000</color>
     <color name="colorTextWhite">#ffffff</color>
 
+    //Button state
+    <color name="buttonEnableOff">#818181</color>
+
+    //Color alarm
+    <color name="alarmButton">#950000</color>
 </resources>
