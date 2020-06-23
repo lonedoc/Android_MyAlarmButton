@@ -36,6 +36,7 @@ class LoginPresenter: OnAuthListener,OnPasswordListener,MvpPresenter<LoginView>(
                 else ->{
                     val cities = Gson().fromJson(serverResponse,Cities::class.java)
                     viewState.initSpinnerTown(cities!!.cityList)
+                    viewState.checkPermission()
                 }
             }
 
@@ -93,6 +94,7 @@ class LoginPresenter: OnAuthListener,OnPasswordListener,MvpPresenter<LoginView>(
             }
     }
 
+
     override fun onPasswordDataReceived(message: String) {
         Log.d("Password",message)
         //viewState.closeProgressDialog()
@@ -121,6 +123,7 @@ class LoginPresenter: OnAuthListener,OnPasswordListener,MvpPresenter<LoginView>(
 
 
     override fun onDestroy() {
+        passwordAPI.onDestroy()
         super.onDestroy()
     }
 
@@ -130,9 +133,15 @@ class LoginPresenter: OnAuthListener,OnPasswordListener,MvpPresenter<LoginView>(
             .replace(") ", "")
             .replace(" ", "")
 
-        viewState.startService(ipList)
+        //viewState.startService(ipList)
 
         val protocol = RubegProtocol.sharedInstance
+
+        if(protocol.isStarted)
+            protocol.stop()
+
+        protocol.configure(ipList,9010)
+        protocol.start()
 
         if(authAPI!= null) authAPI?.onDestroy()
 
@@ -160,6 +169,13 @@ class LoginPresenter: OnAuthListener,OnPasswordListener,MvpPresenter<LoginView>(
 
         protocol.token = token
 
+        protocol.stop()
+
         viewState.openMainActivity()
+    }
+
+    fun errorPermission() {
+        val errorMessage = "Были даны не все разрешения, приложение не продолжит работу."
+        viewState.errorPermissionDialog(errorMessage)
     }
 }

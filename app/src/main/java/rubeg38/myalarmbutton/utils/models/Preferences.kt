@@ -12,4 +12,6 @@ interface Preferences {
     val containsPort:Boolean
     val containsToken:Boolean
     val containsFcmToken: Boolean
+
+    fun clearData()
 }

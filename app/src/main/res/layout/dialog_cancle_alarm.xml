@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+
+        android:text="Для отмены тревоги, необходимо дождаться ГБР и ввести код, который указан у них в приложение"
+        android:textColor="@color/colorTextDark"
+        android:textSize="18sp"
+
+        />
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="8dp"
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        app:errorEnabled="true">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/cancelCodeEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Введите код"
+            android:textColor="@color/colorTextDark"
+            />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <Button
+        android:id="@+id/sendCancelButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:layout_gravity="end"
+        android:text="Отправить"
+        android:textColor="@color/colorAccent"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        />
+</LinearLayout>

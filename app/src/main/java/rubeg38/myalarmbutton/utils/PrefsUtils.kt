@@ -8,6 +8,10 @@ class PrefsUtils(context:Context): Preferences {
     private val prefsId = "myalarmbutton.DataStorage"
     private val prefs: SharedPreferences = context.getSharedPreferences(prefsId, Context.MODE_PRIVATE)
 
+    override fun clearData(){
+        prefs.edit().clear().apply()
+    }
+
     override var serverAddress: ArrayList<String>
         get() {
             val arrayList: ArrayList<String> = ArrayList()

@@ -1,29 +1,40 @@
 package rubeg38.myalarmbutton.utils.services
 
 import android.annotation.SuppressLint
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
+import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.os.PowerManager
 import android.provider.Settings
 import android.util.Log
+import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.extensions.jsonBody
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 import ru.rubeg38.rubegprotocol.ConnectionWatcher
-import rubeg38.myalarmbutton.utils.api.auth.OnAuthListener
+import rubeg38.myalarmbutton.R
+import rubeg38.myalarmbutton.utils.api.cancelAlarm.CancelAPI
+import rubeg38.myalarmbutton.utils.api.cancelAlarm.RPCancelAPI
 import rubeg38.myalarmbutton.utils.api.checkConnection.ConnectionAPI
 import rubeg38.myalarmbutton.utils.api.checkConnection.RPConnectionAPI
 import rubeg38.myalarmbutton.utils.api.coordinate.CoordinateAPI
-import rubeg38.myalarmbutton.utils.api.coordinate.OnCoordinateListener
 import rubeg38.myalarmbutton.utils.api.coordinate.RPCoordinateAPI
 import rubegprotocol.RubegProtocol
 import java.text.DecimalFormat
@@ -31,19 +42,29 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
-class NetworkService: Service(),ConnectionWatcher,LocationListener {
+class NetworkService: Service(),ConnectionWatcher,LocationListener{
 
     lateinit var protocol: RubegProtocol
+    private lateinit var unsubscribe: () -> Unit
+
     private var coordinateAPI:CoordinateAPI? = null
     private var connectionAPI:ConnectionAPI? = null
+    private var cancelAlarm:CancelAPI? = null
     private var connectionLost = false
-    private var isStarted = false
+
+
+
+    companion object{
+        var isStartAlarm = false
+        var isStarted = false
+    }
 
     override fun onBind(intent: Intent?): IBinder? {
         return null
     }
 
     override fun onConnectionLost() {
+        Log.d("ConnectionLost","Yes")
         connectionAPI?.sendConnectionCheckedRequest {}
     }
 
@@ -51,9 +72,33 @@ class NetworkService: Service(),ConnectionWatcher,LocationListener {
 
     }
 
+    @Subscribe(threadMode = ThreadMode.BACKGROUND,sticky = true)
+    fun startAlarm(event:AlarmState){
+        isStartAlarm = when(event.state){
+            true ->{
+                true
+            }
+            false->{
+                cancelAlarm?.sendCancelRequest(event.code,lat,lon,speed,accuracy)
+                false
+            }
+        }
+        Log.d("Event","${event.state}")
+    }
+
+    data class AlarmState(
+        val state:Boolean,
+        val code:String
+    )
 
     @SuppressLint("MissingPermission")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+
+        if(!EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().register(this)
+
+        val notification = createServerNotification(this)
+        startForeground(1,notification)
 
         protocol = RubegProtocol.sharedInstance
 
@@ -62,10 +107,12 @@ class NetworkService: Service(),ConnectionWatcher,LocationListener {
 
         if(intent!!.hasExtra("ipList"))
             protocol.configure(intent.getStringArrayListExtra("ipList")!!,9010)
-        if(intent!!.hasExtra("token"))
+
+        if(intent.hasExtra("token"))
             protocol.token = intent.getStringExtra("token")
 
         protocol.start()
+        unsubscribe = protocol.subscribe(this as ConnectionWatcher)
 
         if(coordinateAPI!= null) coordinateAPI?.onDestroy()
         coordinateAPI = RPCoordinateAPI(protocol)
@@ -73,15 +120,65 @@ class NetworkService: Service(),ConnectionWatcher,LocationListener {
         if(connectionAPI != null) connectionAPI?.onDestroy()
         connectionAPI = RPConnectionAPI(protocol)
 
+        if(cancelAlarm != null) cancelAlarm?.onDestroy()
+        cancelAlarm = RPCancelAPI(protocol)
+
+
         connectionAPI?.sendConnectionCheckedRequest {  }
 
         val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,1000,0F,this)
 
         isStarted = true
+
         wakeLock()
 
         return START_NOT_STICKY
+    }
+
+    private fun createServerNotification(context: Context): Notification? {
+        val notificationChannelID = "ENDLESS SERVICE CHANNEL"
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+        {
+            val builder: NotificationCompat.Builder = NotificationCompat.Builder(context,notificationChannelID)
+            builder
+                .setContentTitle("Сервис")
+                .setContentText("Сервис для общения с сервером")
+                .setSmallIcon(R.drawable.ic_service)
+                .setColor(ContextCompat.getColor(context, R.color.colorPrimary))
+                .setPriority(NotificationCompat.PRIORITY_HIGH) // for under android 26 compatibility
+                .setCategory(NotificationCompat.CATEGORY_ALARM)
+                .build()
+
+            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            val channel = NotificationChannel(
+                notificationChannelID,
+                "Service notifications channel",
+                NotificationManager.IMPORTANCE_HIGH
+            ).let {
+                it.description = "Service channel"
+                it.enableLights(true)
+                it.lightColor = Color.RED
+                it.enableVibration(true)
+                it
+            }
+            notificationManager.createNotificationChannel(channel)
+            return builder.build()
+        }
+        else
+        {
+            val builder: NotificationCompat.Builder = NotificationCompat.Builder(context,notificationChannelID)
+
+            return builder
+                .setContentTitle("Сервис")
+                .setContentText("Сервис для общения с сервером")
+                .setSmallIcon(R.drawable.ic_service)
+                .setColor(ContextCompat.getColor(context, R.color.colorPrimary))
+                .setPriority(NotificationCompat.PRIORITY_HIGH) // for under android 26 compatibility
+                .setCategory(NotificationCompat.CATEGORY_ALARM)
+                .build()
+        }
     }
 
     private var wakeLock:PowerManager.WakeLock? = null
@@ -138,6 +235,9 @@ class NetworkService: Service(),ConnectionWatcher,LocationListener {
     override fun onDestroy() {
         isStarted = false
 
+        if(EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().unregister(this)
+
         wakeLock?.let {
             if (it.isHeld) {
                 it.release()
@@ -149,33 +249,59 @@ class NetworkService: Service(),ConnectionWatcher,LocationListener {
 
         connectionAPI?.onDestroy()
         coordinateAPI?.onDestroy()
+        cancelAlarm?.onDestroy()
+
+        unsubscribe()
+        stopForeground(true)
+
+        stopSelf()
 
         super.onDestroy()
     }
 
     private var oldSpeed:Float? = null
-    private val coordinateBuffer:ArrayList<Pair<String,String>> = ArrayList()
-    override fun onLocationChanged(location: Location?) {
-        if(location==null || protocol.token==null) return
+    private val coordinateBuffer:ArrayList<Coordinate> = ArrayList()
 
-        while (coordinateBuffer.isNotEmpty())
+    private var lat:String? = null
+    private var lon:String? = null
+    private var speed:Int? = null
+    private var accuracy:Float? = null
+
+    data class Coordinate(
+        val lat:String,
+        val lon:String,
+        val speed:Int,
+        val accuracy:Float
+    )
+    override fun onLocationChanged(location: Location?) {
+        if(location == null) return
+        val df = DecimalFormat("#.######")
+        lat = df.format(location.latitude)
+        lon = df.format(location.longitude)
+        speed = (location.speed * 3.6).toInt()
+        accuracy = location.accuracy
+
+        if( protocol.token==null || !isStartAlarm) return
+
+        while (coordinateBuffer.isNotEmpty() && protocol.isConnected)
         {
             val lastIndex = coordinateBuffer.lastIndex
             val coordinate = coordinateBuffer.removeAt(lastIndex)
-            coordinateAPI?.sendCoordinateRequest(coordinate.first,coordinate.second)
+            coordinateAPI?.sendCoordinateRequest(coordinate.lat,coordinate.lon,coordinate.speed,coordinate.accuracy)
         }
 
         if(oldSpeed == location.speed) return
 
-        val df = DecimalFormat("#.######")
+        oldSpeed = location.speed
+
 
         if(!protocol.isConnected)
         {
-            coordinateBuffer.add(Pair(df.format(location.latitude),df.format(location.longitude)))
+            coordinateBuffer.add(Coordinate(lat!!,lon!!,speed!!,accuracy!!))
             return
         }
 
-        coordinateAPI?.sendCoordinateRequest(df.format(location.latitude),df.format(location.longitude))
+        coordinateAPI?.sendCoordinateRequest(lat!!,lon!!,speed!!,accuracy!!)
 
     }
 
@@ -188,6 +314,7 @@ class NetworkService: Service(),ConnectionWatcher,LocationListener {
 
     override fun onProviderDisabled(provider: String?) {
     }
+
 
 
 }

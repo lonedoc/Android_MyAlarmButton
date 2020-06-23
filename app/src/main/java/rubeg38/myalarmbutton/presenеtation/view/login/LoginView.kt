@@ -24,4 +24,8 @@ interface LoginView:MvpView {
     fun startService(ipList: java.util.ArrayList<String>)
     @StateStrategyType(value = SkipStrategy::class)
     fun openMainActivity()
+    @StateStrategyType(value = SkipStrategy::class)
+    fun checkPermission()
+    @StateStrategyType(value = SkipStrategy::class)
+    fun errorPermissionDialog(errorMessage: String)
 }

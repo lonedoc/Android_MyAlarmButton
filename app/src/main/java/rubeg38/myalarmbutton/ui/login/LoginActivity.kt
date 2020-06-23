@@ -2,12 +2,15 @@ package rubeg38.myalarmbutton.ui.login
 
 import android.app.AlertDialog
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.redmadrobot.inputmask.MaskedTextChangedListener
 import kotlinx.android.synthetic.main.activity_login.*
 import moxy.MvpAppCompatActivity
@@ -24,6 +27,7 @@ import rubeg38.myalarmbutton.utils.interfaces.RegistrationCallback
 import rubeg38.myalarmbutton.utils.models.setOnFocusChanged
 import rubeg38.myalarmbutton.utils.models.setOnTextChanged
 import rubeg38.myalarmbutton.utils.services.NetworkService
+import kotlin.system.exitProcess
 
 class LoginActivity:MvpAppCompatActivity(),LoginView,RegistrationCallback {
     @InjectPresenter
@@ -58,8 +62,7 @@ class LoginActivity:MvpAppCompatActivity(),LoginView,RegistrationCallback {
     override fun onStart() {
         super.onStart()
         Log.d("Model", Build.MODEL)
-        val preferences = PrefsUtils(this)
-        presenter.init(preferences)
+
     }
 
     override fun setPhone(phone: String) {
@@ -180,6 +183,94 @@ class LoginActivity:MvpAppCompatActivity(),LoginView,RegistrationCallback {
             }
             .create()
             .show()
+    }
+
+
+
+    private val permissionGranted = PackageManager.PERMISSION_GRANTED
+
+    override fun checkPermission() {
+        if(ContextCompat.checkSelfPermission(applicationContext,android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == permissionGranted &&
+            ContextCompat.checkSelfPermission(applicationContext,android.Manifest.permission.READ_PHONE_STATE) == permissionGranted &&
+            ContextCompat.checkSelfPermission(applicationContext,android.Manifest.permission.FOREGROUND_SERVICE) == permissionGranted &&
+            ContextCompat.checkSelfPermission(applicationContext,android.Manifest.permission.ACCESS_BACKGROUND_LOCATION) == permissionGranted &&
+            ContextCompat.checkSelfPermission(applicationContext, android.Manifest.permission.ACCESS_FINE_LOCATION) == permissionGranted &&
+            ContextCompat.checkSelfPermission(applicationContext, android.Manifest.permission.ACCESS_COARSE_LOCATION) == permissionGranted
+        )
+        {
+            val preferences = PrefsUtils(this)
+            presenter.init(preferences)
+        }
+
+
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(
+                android.Manifest.permission.ACCESS_FINE_LOCATION,
+                android.Manifest.permission.ACCESS_COARSE_LOCATION,
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                android.Manifest.permission.CALL_PHONE,
+                android.Manifest.permission.WAKE_LOCK,
+                android.Manifest.permission.READ_PHONE_STATE,
+                android.Manifest.permission.SYSTEM_ALERT_WINDOW,
+                android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                android.Manifest.permission.ACCESS_NETWORK_STATE,
+                android.Manifest.permission.INTERNET,
+                android.Manifest.permission.VIBRATE
+            ),
+            permissionGranted
+        )
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(
+                    android.Manifest.permission.FOREGROUND_SERVICE
+                ),
+                permissionGranted
+            )
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(
+                    android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                ),
+                permissionGranted
+            )
+        }
+    }
+
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        if(grantResults.isEmpty()) return
+
+        when{
+            grantResults.isNotEmpty() && grantResults[1] == permissionGranted && grantResults[2] == permissionGranted && grantResults[3] == permissionGranted ->{
+                val preferences = PrefsUtils(this)
+                presenter.init(preferences)
+            }
+            else->{
+                presenter.errorPermission()
+            }
+        }
+    }
+
+    override fun errorPermissionDialog(errorMessage: String) {
+
+        AlertDialog.Builder(this)
+            .setMessage(errorMessage)
+            .setCancelable(false)
+            .setPositiveButton("Разрешить"){_,_->
+                checkPermission()
+            }
+            .setNegativeButton("Закрыть приложение"){_,_->
+                exitProcess(0)
+            }
+            .create().show()
     }
 
 }

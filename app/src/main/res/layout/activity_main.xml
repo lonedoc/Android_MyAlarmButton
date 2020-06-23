@@ -5,8 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.main.MainActivity"
-    android:gravity="center">
+    android:gravity="center"
+    android:orientation="vertical">
 
+   <androidx.appcompat.widget.Toolbar
+       android:id="@+id/mainToolbar"
+       style="@style/Toolbar"
+       app:popupTheme="@style/PopupToolbarNormal"
+       />
    <Button
        android:id="@+id/alarmButton"
        android:layout_width="match_parent"
@@ -17,4 +23,14 @@
        android:background="@color/alarmButton"
        />
 
+   <Button
+       android:id="@+id/cancelAlarm"
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"
+       android:text="Отмена тревоги"
+       android:textSize="24sp"
+       android:textColor="@color/colorTextWhite"
+       android:background="@color/colorAccent"
+       android:visibility="gone"
+       />
 </LinearLayout>

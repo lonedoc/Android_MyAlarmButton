@@ -211,6 +211,9 @@ class RubegProtocol {
         // Debug
         println("Protocol: reset")
 
+        if (sendLoopSemaphore.availablePermits() == 0)
+            sendLoopSemaphore.release()
+
 //        readLoopSemaphore.acquire()
         sendLoopSemaphore.acquire()
 
@@ -230,7 +233,6 @@ class RubegProtocol {
         incomingMessagesCount = 0
         outcomingMessagesCount = 0
 
-        token = null
 
 //        readLoopSemaphore.release()
         sendLoopSemaphore.release()
@@ -242,8 +244,6 @@ class RubegProtocol {
         thread {
             while (started) {
 //                readLoopSemaphore.acquire()
-
-
                 var buffer = ByteBuffer.allocate(1536)
 
                 try {
@@ -335,17 +335,16 @@ class RubegProtocol {
                 failedTransmissions.forEach { transmission ->
                     val messageNumber = transmission.packet.headers.messageNumber
 
+                    packetsQueue.removeAll { it.headers.messageNumber == messageNumber }
+
+                    outcomingTransmissions[messageNumber]?.onComplete?.invoke(false)
+                    outcomingTransmissions.remove(messageNumber)
+
                     reset()
 
                     connectionWatchers.forEach { it?.onConnectionLost() }
 
                     currentHostIndex++
-
-             /*       //TODO теперь вот тут надо отключать протокол
-                    packetsQueue.removeAll { it.headers.messageNumber == messageNumber }
-
-                    outcomingTransmissions[messageNumber]?.onComplete?.invoke(false)
-                    outcomingTransmissions.remove(messageNumber)*/
                 }
 
                 congestionWindow.removeAll { it.attemptsCount > MAX_ATTEMPTS_COUNT }
@@ -382,20 +381,6 @@ class RubegProtocol {
                     }
                 }
 
-              /*  // Maintain connection
-                val syncTimeHasCome = lastRequestTime + SYNC_INTERVAL <= System.currentTimeMillis()
-
-                if (syncTimeHasCome) {
-                    if (isConnected) {
-                        val connectionPacket = ConnectionPacket(token!!)
-
-                        try {
-                            sendPacket(connectionPacket)
-                        } catch (ex: IOException) {
-                            ex.printStackTrace()
-                        }
-                    }
-                }*/
 
                 if (packetsQueueIsEmpty)
                     sleep(SLEEP_INTERVAL)

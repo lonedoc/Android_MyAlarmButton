@@ -8,17 +8,17 @@ import rubegprotocol.RubegProtocol
 class RPConnectionAPI(
     private val protocol: RubegProtocol
 ):ConnectionAPI {
-    private var unsubscribe = protocol.subscribe(this as TextMessageWatcher)
+    //private var unsubscribe = protocol.subscribe(this as TextMessageWatcher)
 
     override fun sendConnectionCheckedRequest(complete: (Boolean) -> Unit) {
         val message = JSONObject()
-        message.put("\$c$", "checkConnection")
+        message.put("\$c$", "checkconnection")
         protocol.send(message.toString()){
         }
     }
 
     override fun onDestroy() {
-        unsubscribe()
+        //unsubscribe()
     }
 
 }
