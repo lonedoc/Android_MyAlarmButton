@@ -53,10 +53,10 @@ class NetworkService: Service(),ConnectionWatcher,LocationListener{
     private var connectionLost = false
 
 
-
     companion object{
         var isStartAlarm = false
         var isStarted = false
+        var isHaveCoordinate = false
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -72,6 +72,7 @@ class NetworkService: Service(),ConnectionWatcher,LocationListener{
 
     }
 
+    @SuppressLint("MissingPermission")
     @Subscribe(threadMode = ThreadMode.BACKGROUND,sticky = true)
     fun startAlarm(event:AlarmState){
         isStartAlarm = when(event.state){
@@ -127,7 +128,15 @@ class NetworkService: Service(),ConnectionWatcher,LocationListener{
         connectionAPI?.sendConnectionCheckedRequest {  }
 
         val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,1000,0F,this)
+        if (locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER) != null)
+        {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,1000,0F,this)
+        }
+        else
+            if(locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER) != null)
+            {
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,1000,0F,this)
+            }
 
         isStarted = true
 
@@ -275,13 +284,20 @@ class NetworkService: Service(),ConnectionWatcher,LocationListener{
     )
     override fun onLocationChanged(location: Location?) {
         if(location == null) return
+
         val df = DecimalFormat("#.######")
         lat = df.format(location.latitude)
         lon = df.format(location.longitude)
         speed = (location.speed * 3.6).toInt()
         accuracy = location.accuracy
 
-        if( protocol.token==null || !isStartAlarm) return
+        if( protocol.token==null || !isStartAlarm)
+        {
+            coordinateBuffer.add(Coordinate(lat!!,lon!!,speed!!,accuracy!!))
+            return
+        }
+
+        isHaveCoordinate = true
 
         while (coordinateBuffer.isNotEmpty() && protocol.isConnected)
         {

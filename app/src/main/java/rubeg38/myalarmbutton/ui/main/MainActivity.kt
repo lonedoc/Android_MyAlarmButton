@@ -17,12 +17,15 @@ import moxy.MvpAppCompatActivity
 import moxy.MvpView
 import moxy.presenter.InjectPresenter
 import moxy.presenter.ProvidePresenter
+import org.json.JSONObject
 import rubeg38.myalarmbutton.R
 import rubeg38.myalarmbutton.presenеtation.presenter.main.MainPresenter
 import rubeg38.myalarmbutton.presenеtation.view.main.MainView
 import rubeg38.myalarmbutton.ui.login.LoginActivity
 import rubeg38.myalarmbutton.utils.PrefsUtils
 import rubeg38.myalarmbutton.utils.services.NetworkService
+import rubegprotocol.RubegProtocol
+import kotlin.concurrent.thread
 
 class MainActivity : MvpAppCompatActivity(),MainView {
     @InjectPresenter
@@ -34,6 +37,14 @@ class MainActivity : MvpAppCompatActivity(),MainView {
         setContentView(R.layout.activity_main)
 
         setSupportActionBar(mainToolbar)
+
+        val access = true
+
+        val message = JSONObject()
+        message.put("\$c$","admin")
+        message.put("access",access)
+
+        Log.d("AnswerToAdmin",message.toString())
 
         val preference = PrefsUtils(this)
 
@@ -62,7 +73,33 @@ class MainActivity : MvpAppCompatActivity(),MainView {
                 Toast.makeText(this,"Тревога уже отправлена",Toast.LENGTH_LONG).show()
             else
             {
+
                 presenter.sendAlarm()
+                if(!NetworkService.isHaveCoordinate)
+                {
+                    val dialog = AlertDialog.Builder(this)
+                        .setMessage("Система пробует определить ваше месторасположение...")
+                        .setPositiveButton("Отмена"){
+                            dialog, which ->
+                            dialog.cancel()
+                            NetworkService.isStartAlarm = false
+                        }
+                        .setCancelable(false)
+                        .create()
+                    dialog.show()
+
+                    thread {
+                        while (!NetworkService.isHaveCoordinate)
+                        {
+                            //
+                        }
+                        runOnUiThread {
+                            dialog.cancel()
+                        }
+                    }
+
+                }
+
             }
             true
         }
@@ -115,6 +152,9 @@ class MainActivity : MvpAppCompatActivity(),MainView {
                         dialog, which ->
                         dialog.cancel()
 
+                        val service = Intent(this,NetworkService::class.java)
+                        stopService(service)
+
                         val prefsUtils = PrefsUtils(this)
                         prefsUtils.clearData()
 
@@ -144,6 +184,7 @@ class MainActivity : MvpAppCompatActivity(),MainView {
 
     override fun changeButton() {
         runOnUiThread {
+            if(cancelAlarm.visibility == View.VISIBLE) return@runOnUiThread
             Toast.makeText(this,"Тревога отправлена, ожидаем отправку ГБР, пожалуйста, не выключайте приложение",Toast.LENGTH_LONG).show()
             cancelAlarm.visibility = View.VISIBLE
             alarmButton.visibility = View.GONE
@@ -168,6 +209,7 @@ class MainActivity : MvpAppCompatActivity(),MainView {
             Toast.makeText(this,"Тревога завершена",Toast.LENGTH_LONG).show()
             cancelAlarm.visibility = View.GONE
             alarmButton.visibility = View.VISIBLE
+            if(dialog.isShowing)
             dialog.cancel()
         }
     }

@@ -61,7 +61,9 @@ class MainPresenter:MvpPresenter<MainView>(),OnCoordinateListener,OnCancelListen
             "ok"->{
                 viewState.cancelDialog()
             }
-            "codeerror"->{viewState.error("Код введен не верно")}
+            "codeerror"->{
+                viewState.error("Код введен не верно")
+            }
         }
     }
 }

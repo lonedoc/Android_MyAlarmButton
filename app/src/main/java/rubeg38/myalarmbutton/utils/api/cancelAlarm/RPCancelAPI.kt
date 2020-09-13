@@ -39,12 +39,19 @@ class RPCancelAPI(
 
     override fun onTextMessageReceived(message: String) {
         Log.d("Message",message)
-        if(JSONObject(message).getString("\$c$") != "cancelalarm") return
-        Log.d("CancelAlarm",message)
-        val gson = Gson()
-        val cancelAlarm = gson.fromJson(message, CancelAlarm::class.java)
 
-        onCancelListener?.onCancelListener(cancelAlarm.result)
+        when(JSONObject(message).getString("\$c$")){
+            "cancelalarm"->{
+                Log.d("CancelAlarm",message)
+                val gson = Gson()
+                val cancelAlarm = gson.fromJson(message, CancelAlarm::class.java)
+
+                onCancelListener?.onCancelListener(cancelAlarm.result)
+            }
+            else->{ return}
+        }
+
+
     }
 
     override fun onDestroy() {

@@ -51,6 +51,7 @@ class LoginPresenter: OnAuthListener,OnPasswordListener,MvpPresenter<LoginView>(
     }
 
     fun savedPCSInfo(ipList: ArrayList<String>, nameOfOrganization: String) {
+        Log.d("IpList","$ipList")
         this.ipList = ipList
         this.nameOfOrganization = nameOfOrganization
     }
@@ -72,10 +73,15 @@ class LoginPresenter: OnAuthListener,OnPasswordListener,MvpPresenter<LoginView>(
             val protocol = RubegProtocol.sharedInstance
 
             if(protocol.isStarted)
-            protocol.stop()
+            {
 
+                protocol.stop()
+            }
+
+            protocol.token = null
             protocol.configure(ipList,9010)
             protocol.start()
+
 
             if(passwordAPI!= null) passwordAPI?.onDestroy()
 
@@ -123,7 +129,7 @@ class LoginPresenter: OnAuthListener,OnPasswordListener,MvpPresenter<LoginView>(
 
 
     override fun onDestroy() {
-        passwordAPI.onDestroy()
+        passwordAPI?.onDestroy()
         super.onDestroy()
     }
 
@@ -140,6 +146,7 @@ class LoginPresenter: OnAuthListener,OnPasswordListener,MvpPresenter<LoginView>(
         if(protocol.isStarted)
             protocol.stop()
 
+        Log.d("IpList","$ipList")
         protocol.configure(ipList,9010)
         protocol.start()
 
