@@ -306,7 +306,7 @@ class NetworkService: Service(),ConnectionWatcher,LocationListener{
             coordinateAPI?.sendCoordinateRequest(coordinate.lat,coordinate.lon,coordinate.speed,coordinate.accuracy)
         }
 
-        if(oldSpeed == location.speed) return
+        if(oldSpeed == location.speed && speed == 0) return
 
         oldSpeed = location.speed
 

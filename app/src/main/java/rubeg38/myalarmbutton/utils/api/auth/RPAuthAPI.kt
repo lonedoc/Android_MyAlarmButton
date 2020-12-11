@@ -32,6 +32,7 @@ class RPAuthAPI(
 
     override fun onTextMessageReceived(message: String) {
 
+        Log.d("Message",message)
         if(JSONObject(message).getString("\$c$") != "regok") return
 
         val gson = Gson()
