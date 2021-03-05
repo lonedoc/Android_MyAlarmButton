@@ -15,4 +15,6 @@ interface MainView:MvpView {
     fun cancelDialog()
     @StateStrategyType(value = SkipStrategy::class)
     fun openLoginActivity()
+    @StateStrategyType(value = SkipStrategy::class)
+    fun blockDialog(message: String)
 }

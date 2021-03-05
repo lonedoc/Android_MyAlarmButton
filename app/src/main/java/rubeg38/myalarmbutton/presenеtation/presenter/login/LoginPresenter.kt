@@ -13,6 +13,7 @@ import rubeg38.myalarmbutton.utils.api.ips.TCPRequest
 import rubeg38.myalarmbutton.utils.api.password.OnPasswordListener
 import rubeg38.myalarmbutton.utils.api.password.PasswordAPI
 import rubeg38.myalarmbutton.utils.api.password.RPPasswordAPI
+import rubeg38.myalarmbutton.utils.data.Auth
 import rubeg38.myalarmbutton.utils.data.Cities
 import rubegprotocol.RubegProtocol
 import java.util.ArrayList
@@ -139,8 +140,6 @@ class LoginPresenter: OnAuthListener,OnPasswordListener,MvpPresenter<LoginView>(
             .replace(") ", "")
             .replace(" ", "")
 
-        //viewState.startService(ipList)
-
         val protocol = RubegProtocol.sharedInstance
 
         if(protocol.isStarted)
@@ -167,14 +166,17 @@ class LoginPresenter: OnAuthListener,OnPasswordListener,MvpPresenter<LoginView>(
         }
     }
 
-    override fun onAuthDataReceived(token: String) {
+    override fun onAuthDataReceived(message: Auth) {
         val protocol = RubegProtocol.sharedInstance
 
-        preferences?.token = token
+        preferences?.token = message.token
+        preferences?.companyPhone = message.phone
+        preferences?.stationary = message.stationary
+        preferences?.patrol = message.patrol
         preferences?.serverAddress = ipList
         preferences?.serverPort = 9010
 
-        protocol.token = token
+        protocol.token = message.token
 
         protocol.stop()
 

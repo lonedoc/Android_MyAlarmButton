@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/linearLayout"
@@ -43,41 +44,51 @@
           android:visibility="gone" />
    </LinearLayout>
 
+     <LinearLayout
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:layout_marginBottom="20dp"
+         app:layout_constraintBottom_toBottomOf="parent"
+         app:layout_constraintEnd_toEndOf="parent"
+         app:layout_constraintStart_toStartOf="parent"
+         android:gravity="center"
+         >
 
-   <LinearLayout
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:layout_marginBottom="20dp"
-       app:layout_constraintBottom_toBottomOf="parent"
-       app:layout_constraintEnd_toEndOf="parent"
-       app:layout_constraintStart_toStartOf="parent">
+        <Button
+            android:id="@+id/roll_up"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/roll_up"
+            android:textColor="@color/colorTextWhite"
+            android:textSize="14sp"
+            android:paddingEnd="16dp"
+            android:paddingStart="16dp"
+            android:layout_marginEnd="20dp"
+            android:backgroundTint="@color/color_status_button"/>
 
-      <Button
-          android:id="@+id/roll_up"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_marginEnd="20dp"
-          android:text="@string/roll_up"
+        <ImageButton
+            android:id="@+id/phoneButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorTextWhite"
+            android:textSize="14sp"
+            android:src="@drawable/ic_phone"
+            android:backgroundTint="@color/color_status_button"
+            android:contentDescription="@string/phonebutton" />
 
-          android:textColor="@color/colorTextWhite"
-          android:textSize="14sp"
-          android:paddingEnd="16dp"
-          android:paddingStart="16dp"
-          android:backgroundTint="@color/color_status_button"/>
+        <Button
+            android:id="@+id/check_it"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
 
-      <Button
-          android:id="@+id/check_it"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_marginStart="20dp"
-          android:text="@string/check_it"
+            android:layout_marginStart="20dp"
 
-          android:textColor="@color/colorTextWhite"
-          android:textSize="14sp"
-          android:paddingEnd="16dp"
-          android:paddingStart="16dp"
-          android:backgroundTint="@color/color_status_button"/>
-   </LinearLayout>
-
+            android:text="@string/check_it"
+            android:textColor="@color/colorTextWhite"
+            android:textSize="14sp"
+            android:paddingEnd="16dp"
+            android:paddingStart="16dp"
+            android:backgroundTint="@color/color_status_button"/>
+     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

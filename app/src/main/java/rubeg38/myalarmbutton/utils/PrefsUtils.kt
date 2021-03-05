@@ -41,6 +41,24 @@ class PrefsUtils(context:Context): Preferences {
             val editor = prefs.edit()
             editor.putString("fcmtoken", value).apply()
         }
+    override var companyPhone: String?
+        get() = prefs.getString("companyPhone", null)
+        set(value) {
+            val editor = prefs.edit()
+            editor.putString("companyPhone", value).apply()
+        }
+    override var stationary: String?
+        get() = prefs.getString("stationary", "0")
+        set(value) {
+            val editor = prefs.edit()
+            editor.putString("stationary", value).apply()
+        }
+    override var patrol: String?
+        get() = prefs.getString("patrol", "0")
+        set(value) {
+            val editor = prefs.edit()
+            editor.putString("patrol", value).apply()
+        }
 
 
     override var phone:String?
@@ -70,6 +88,12 @@ class PrefsUtils(context:Context): Preferences {
 
     override val containsFcmToken: Boolean
         get() = prefs.contains("fcmtoken")
+    override val containsStationary: Boolean
+        get() = prefs.contains("stationary")
+    override val containsPatrol: Boolean
+        get() = prefs.contains("patrol")
+    override val containsCompanyPhone: Boolean
+        get() = prefs.contains("companyPhone")
 
     override val containsPhone:Boolean
         get() = prefs.contains("phone")

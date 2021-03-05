@@ -32,12 +32,11 @@ class RPAuthAPI(
 
     override fun onTextMessageReceived(message: String) {
 
-        Log.d("Message",message)
         if(JSONObject(message).getString("\$c$") != "regok") return
 
         val gson = Gson()
         val auth = gson.fromJson(message, Auth::class.java)
-        onAuthListener?.onAuthDataReceived(auth.token)
+        onAuthListener?.onAuthDataReceived(auth)
     }
 
     override fun onDestroy() {

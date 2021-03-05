@@ -37,6 +37,7 @@ class LoginActivity:MvpAppCompatActivity(),LoginView,RegistrationCallback {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
+
         passwordRequest.setOnClickListener { presenter.passwordRequest(phoneEditText.text.toString()) }
 
         phoneEditText.setOnTextChanged { str -> presenter.validatePhone(str.toString()) }
