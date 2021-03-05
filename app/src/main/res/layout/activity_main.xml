@@ -1,36 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/linearLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.main.MainActivity"
-    android:gravity="center"
-    android:orientation="vertical">
+    android:background="#ffffff"
+    android:orientation="vertical"
+    tools:context=".ui.main.MainActivity">
 
    <androidx.appcompat.widget.Toolbar
        android:id="@+id/mainToolbar"
        style="@style/Toolbar"
-       app:popupTheme="@style/PopupToolbarNormal"
-       />
-   <Button
-       android:id="@+id/alarmButton"
        android:layout_width="match_parent"
-       android:layout_height="match_parent"
-       android:text="ТРЕВОГА"
-       android:textSize="24sp"
-       android:textColor="@color/colorTextWhite"
-       android:background="@color/alarmButton"
-       />
+       android:layout_height="wrap_content"
+       app:layout_constraintEnd_toEndOf="parent"
+       app:layout_constraintStart_toStartOf="parent"
+       app:layout_constraintTop_toTopOf="parent"
+       app:popupTheme="@style/PopupToolbarNormal" />
 
-   <Button
-       android:id="@+id/cancelAlarm"
-       android:layout_width="match_parent"
-       android:layout_height="match_parent"
-       android:text="Отмена тревоги"
-       android:textSize="24sp"
-       android:textColor="@color/colorTextWhite"
-       android:background="@color/colorAccent"
-       android:visibility="gone"
-       />
-</LinearLayout>
+
+   <LinearLayout
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       app:layout_constraintBottom_toBottomOf="parent"
+       app:layout_constraintEnd_toEndOf="parent"
+       app:layout_constraintStart_toStartOf="parent"
+       app:layout_constraintTop_toBottomOf="@+id/mainToolbar">
+
+      <Button
+          android:id="@+id/alarmButton"
+          android:layout_width="250dp"
+          android:layout_height="250dp"
+          android:background="@drawable/alarm_button" />
+
+      <Button
+          android:id="@+id/cancelAlarm"
+          android:layout_width="250dp"
+          android:layout_height="250dp"
+          android:background="@drawable/alarm_button_cancel"
+          android:textSize="24sp"
+          android:visibility="gone" />
+   </LinearLayout>
+
+
+   <LinearLayout
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_marginBottom="20dp"
+       app:layout_constraintBottom_toBottomOf="parent"
+       app:layout_constraintEnd_toEndOf="parent"
+       app:layout_constraintStart_toStartOf="parent">
+
+      <Button
+          android:id="@+id/roll_up"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginEnd="20dp"
+          android:text="@string/roll_up"
+
+          android:textColor="@color/colorTextWhite"
+          android:textSize="14sp"
+          android:paddingEnd="16dp"
+          android:paddingStart="16dp"
+          android:backgroundTint="@color/color_status_button"/>
+
+      <Button
+          android:id="@+id/check_it"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="20dp"
+          android:text="@string/check_it"
+
+          android:textColor="@color/colorTextWhite"
+          android:textSize="14sp"
+          android:paddingEnd="16dp"
+          android:paddingStart="16dp"
+          android:backgroundTint="@color/color_status_button"/>
+   </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

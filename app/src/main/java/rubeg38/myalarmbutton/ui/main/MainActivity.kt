@@ -26,6 +26,7 @@ import rubeg38.myalarmbutton.utils.PrefsUtils
 import rubeg38.myalarmbutton.utils.services.NetworkService
 import rubegprotocol.RubegProtocol
 import kotlin.concurrent.thread
+import kotlin.concurrent.timer
 
 class MainActivity : MvpAppCompatActivity(),MainView {
     @InjectPresenter
@@ -62,6 +63,22 @@ class MainActivity : MvpAppCompatActivity(),MainView {
         service.putExtra("token",preference.token)
         startService(service)
 
+        roll_up.setOnClickListener {
+            val startMain = Intent(Intent.ACTION_MAIN)
+            startMain.addCategory(Intent.CATEGORY_HOME)
+            startMain.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            startActivity(startMain)
+
+        }
+        check_it.setOnClickListener {
+            if(!check_it.isEnabled)
+            {
+                Toast.makeText(this,"Нельзя совершать проверку чаще 2-х минут",Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
+            check_it.isEnabled = false
+           check_it.postDelayed({check_it.isEnabled = true},/*120000*/10000)
+        }
         alarmButton.setOnClickListener {
             if(NetworkService.isStartAlarm)
                 Toast.makeText(this,"Тревога уже отправлена",Toast.LENGTH_LONG).show()
@@ -238,3 +255,5 @@ class MainActivity : MvpAppCompatActivity(),MainView {
 
     }
 }
+
+

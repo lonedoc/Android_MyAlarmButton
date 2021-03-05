@@ -5,6 +5,8 @@
     <string name="change_town">Выберите город:</string>
     <string name="changePSC">Выберите ЧОП:</string>
     <string name="enterPhone">Введите номер телефона</string>
+    <string name="roll_up">Свернуть</string>
+    <string name="check_it">Проверка</string>
 
 
 </resources>
