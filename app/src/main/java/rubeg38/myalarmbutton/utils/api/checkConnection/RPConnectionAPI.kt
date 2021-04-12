@@ -25,7 +25,8 @@ class RPConnectionAPI(
         val gson = Gson().fromJson(message,CheckConnection::class.java)
         if(gson.block !=null && gson.desc != null)
             onConnectionListener?.onConnectionListener(gson.desc)
-        Log.d("message",message)
+        else
+            onConnectionListener?.onConnectionListener("connect")
     }
 
     override fun onDestroy() {

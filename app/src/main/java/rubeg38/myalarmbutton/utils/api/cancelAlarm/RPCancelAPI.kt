@@ -38,7 +38,6 @@ class RPCancelAPI(
     }
 
     override fun onTextMessageReceived(message: String) {
-        Log.d("Message",message)
 
         when(JSONObject(message).getString("\$c$")){
             "cancelalarm"->{

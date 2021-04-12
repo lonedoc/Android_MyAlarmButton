@@ -51,11 +51,10 @@ class NetworkService: Service(),ConnectionWatcher,LocationListener{
     private var connectionAPI:ConnectionAPI? = null
     private var cancelAlarm:CancelAPI? = null
     private var connectionLost = false
-
+    private var isStartAlarm = false
+    private var isStarted = false
 
     companion object{
-        var isStartAlarm = false
-        var isStarted = false
         var isHaveCoordinate = false
     }
 
@@ -141,6 +140,8 @@ class NetworkService: Service(),ConnectionWatcher,LocationListener{
         isStarted = true
 
         wakeLock()
+
+        isHaveCoordinate = false
 
         return START_NOT_STICKY
     }
@@ -268,12 +269,12 @@ class NetworkService: Service(),ConnectionWatcher,LocationListener{
         super.onDestroy()
     }
 
-    private var oldSpeed:Float? = null
+    private var oldSpeed:Int? = 100000000
     private val coordinateBuffer:ArrayList<Coordinate> = ArrayList()
 
     private var lat:String? = null
     private var lon:String? = null
-    private var speed:Int? = null
+    private var speed:Int = 0
     private var accuracy:Float? = null
 
     data class Coordinate(
@@ -282,34 +283,33 @@ class NetworkService: Service(),ConnectionWatcher,LocationListener{
         val speed:Int,
         val accuracy:Float
     )
-    override fun onLocationChanged(location: Location?) {
-        if(location == null) return
-
+    override fun onLocationChanged(location: Location) {
         val df = DecimalFormat("#.######")
         lat = df.format(location.latitude)
         lon = df.format(location.longitude)
         speed = (location.speed * 3.6).toInt()
         accuracy = location.accuracy
 
-        if( protocol.token==null || !isStartAlarm)
+
+        while (coordinateBuffer.isNotEmpty() && protocol.isConnected && isStartAlarm)
         {
-            coordinateBuffer.add(Coordinate(lat!!,lon!!,speed!!,accuracy!!))
+            val lastIndex = coordinateBuffer.lastIndex
+            val coordinate = coordinateBuffer.removeAt(lastIndex)
+            isHaveCoordinate = true
+            coordinateAPI?.sendCoordinateRequest(coordinate.lat,coordinate.lon,coordinate.speed,coordinate.accuracy)
+        }
+
+        if(oldSpeed == speed && speed == 0) return
+
+        oldSpeed = speed
+
+        if(protocol.token==null || !isStartAlarm)
+        {
+            coordinateBuffer.add(Coordinate(lat!!,lon!!,speed,accuracy!!))
             return
         }
 
         isHaveCoordinate = true
-
-        while (coordinateBuffer.isNotEmpty() && protocol.isConnected)
-        {
-            val lastIndex = coordinateBuffer.lastIndex
-            val coordinate = coordinateBuffer.removeAt(lastIndex)
-            coordinateAPI?.sendCoordinateRequest(coordinate.lat,coordinate.lon,coordinate.speed,coordinate.accuracy)
-        }
-
-        if(oldSpeed == location.speed && speed == 0) return
-
-        oldSpeed = location.speed
-
 
         if(!protocol.isConnected)
         {
@@ -318,17 +318,16 @@ class NetworkService: Service(),ConnectionWatcher,LocationListener{
         }
 
         coordinateAPI?.sendCoordinateRequest(lat!!,lon!!,speed!!,accuracy!!)
-
     }
 
 
     override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
     }
 
-    override fun onProviderEnabled(provider: String?) {
+    override fun onProviderEnabled(provider: String) {
     }
 
-    override fun onProviderDisabled(provider: String?) {
+    override fun onProviderDisabled(provider: String) {
     }
 
 

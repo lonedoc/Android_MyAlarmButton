@@ -269,7 +269,7 @@ class RubegProtocol {
                 val packet:Packet = PacketUtils.decode(buffer.array()) ?: continue
 
                 // Debug
-                println("<- { content type: ${packet.headers.contentType}, message number: ${packet.headers.messageNumber}, packet number: ${packet.headers.packetNumber} }")
+                println("<- { content type: ${packet.headers.contentType}, message number: ${packet.headers.messageNumber}, packet number: ${packet.headers.packetNumber},packet size: ${packet.headers.messageSize} }")
 
                 when (packet.headers.contentType) {
                     ContentType.ACKNOWLEDGEMENT -> {
@@ -423,7 +423,7 @@ class RubegProtocol {
         val messageNumber = packet.headers.messageNumber
 
         if(packet.headers.sessionId != null)
-        Log.d("handleData",packet.headers.sessionId)
+        Log.d("handleData",packet.headers.sessionId.toString())
 
         val acknowledgement = AcknowledgementPacket(packet)
 

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/linearLayout"
@@ -10,85 +9,95 @@
     android:orientation="vertical"
     tools:context=".ui.main.MainActivity">
 
-   <androidx.appcompat.widget.Toolbar
-       android:id="@+id/mainToolbar"
-       style="@style/Toolbar"
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       app:layout_constraintEnd_toEndOf="parent"
-       app:layout_constraintStart_toStartOf="parent"
-       app:layout_constraintTop_toTopOf="parent"
-       app:popupTheme="@style/PopupToolbarNormal" />
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/mainToolbar"
+        style="@style/Toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:popupTheme="@style/PopupToolbarNormal" />
 
 
-   <LinearLayout
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       app:layout_constraintBottom_toBottomOf="parent"
-       app:layout_constraintEnd_toEndOf="parent"
-       app:layout_constraintStart_toStartOf="parent"
-       app:layout_constraintTop_toBottomOf="@+id/mainToolbar">
-
-      <Button
-          android:id="@+id/alarmButton"
-          android:layout_width="250dp"
-          android:layout_height="250dp"
-          android:background="@drawable/alarm_button" />
-
-      <Button
-          android:id="@+id/cancelAlarm"
-          android:layout_width="250dp"
-          android:layout_height="250dp"
-          android:background="@drawable/alarm_button_cancel"
-          android:textSize="24sp"
-          android:visibility="gone" />
-   </LinearLayout>
-
-     <LinearLayout
-         android:layout_width="match_parent"
-         android:layout_height="wrap_content"
-         android:layout_marginBottom="20dp"
-         app:layout_constraintBottom_toBottomOf="parent"
-         app:layout_constraintEnd_toEndOf="parent"
-         app:layout_constraintStart_toStartOf="parent"
-         android:gravity="center"
-         >
+    <LinearLayout
+        android:id="@+id/linearLayout2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mainToolbar">
 
         <Button
-            android:id="@+id/roll_up"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/roll_up"
-            android:textColor="@color/colorTextWhite"
-            android:textSize="14sp"
-            android:paddingEnd="16dp"
-            android:paddingStart="16dp"
-            android:layout_marginEnd="20dp"
-            android:backgroundTint="@color/color_status_button"/>
+            android:id="@+id/alarmButton"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
+            android:background="@drawable/alarm_button" />
 
-        <ImageButton
+        <Button
+            android:id="@+id/cancelAlarm"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
+            android:background="@drawable/alarm_button_cancel"
+            android:textSize="24sp"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/phoneButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/colorTextWhite"
-            android:textSize="14sp"
+            android:contentDescription="@string/phonebutton"
             android:src="@drawable/ic_phone"
-            android:backgroundTint="@color/color_status_button"
-            android:contentDescription="@string/phonebutton" />
-
-        <Button
-            android:id="@+id/check_it"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-
-            android:layout_marginStart="20dp"
-
-            android:text="@string/check_it"
             android:textColor="@color/colorTextWhite"
             android:textSize="14sp"
-            android:paddingEnd="16dp"
-            android:paddingStart="16dp"
-            android:backgroundTint="@color/color_status_button"/>
-     </LinearLayout>
+            app:backgroundTint="@color/color_status_button"
+            app:rippleColor="@color/color_status_button" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/check_it"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="32dp"
+                android:backgroundTint="@color/color_status_button"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="@string/check_it"
+                android:textColor="@color/colorTextWhite"
+                android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/roll_up"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:layout_marginEnd="20dp"
+                android:backgroundTint="@color/color_status_button"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="@string/roll_up"
+                android:textColor="@color/colorTextWhite"
+                android:textSize="14sp" />
+        </LinearLayout>
+    </LinearLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

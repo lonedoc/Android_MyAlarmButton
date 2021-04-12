@@ -17,4 +17,6 @@ interface MainView:MvpView {
     fun openLoginActivity()
     @StateStrategyType(value = SkipStrategy::class)
     fun blockDialog(message: String)
+    @StateStrategyType(value = SkipStrategy::class)
+    fun connectDialog()
 }

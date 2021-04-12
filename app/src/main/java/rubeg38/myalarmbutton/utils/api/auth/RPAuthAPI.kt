@@ -25,7 +25,6 @@ class RPAuthAPI(
         message.put("keeplive", "10")
         message.put("model",model)
 
-        Log.d("Reg",message.toString())
         protocol.send(message.toString()){
         }
     }

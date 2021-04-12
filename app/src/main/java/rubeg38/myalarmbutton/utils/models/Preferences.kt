@@ -9,6 +9,7 @@ interface Preferences {
     var companyPhone:String?
     var stationary:String?
     var patrol:String?
+    var version:String?
 
     val containsPhone:Boolean
     val containsAddress:Boolean
@@ -18,6 +19,7 @@ interface Preferences {
     val containsStationary:Boolean
     val containsPatrol:Boolean
     val containsCompanyPhone:Boolean
+    val containsVersion:Boolean
 
     fun clearData()
 }

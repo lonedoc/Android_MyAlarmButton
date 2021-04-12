@@ -84,7 +84,10 @@ class MainPresenter:MvpPresenter<MainView>(),OnCoordinateListener,OnCancelListen
     }
 
     override fun onConnectionListener(message: String) {
-        viewState.blockDialog(message)
+        if(message=="connect")
+            viewState.connectDialog()
+        else
+            viewState.blockDialog(message)
     }
 
     fun sendStationaryAlarm() {

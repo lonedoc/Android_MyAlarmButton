@@ -21,6 +21,7 @@ import rubeg38.myalarmbutton.presenеtation.view.main.MainView
 import rubeg38.myalarmbutton.ui.login.LoginActivity
 import rubeg38.myalarmbutton.utils.PrefsUtils
 import rubeg38.myalarmbutton.utils.services.NetworkService
+import rubeg38.myalarmbutton.BuildConfig
 import kotlin.concurrent.thread
 
 class MainActivity : MvpAppCompatActivity(),MainView {
@@ -76,24 +77,9 @@ class MainActivity : MvpAppCompatActivity(),MainView {
                 return@setOnClickListener
             }
             check_it.isEnabled = false
-           check_it.postDelayed({ check_it.isEnabled = true }, 120000)
-        }
-        alarmButton.setOnClickListener {
-            if(NetworkService.isStartAlarm)
-                Toast.makeText(this, "Тревога уже отправлена", Toast.LENGTH_LONG).show()
-            else
-                Toast.makeText(
-                    this,
-                    "Тревога отправится только при долгом зажатие",
-                    Toast.LENGTH_LONG
-                ).show()
+           check_it.postDelayed({ check_it.isEnabled = true }, 10000)
         }
         alarmButton.setOnLongClickListener{
-            if(NetworkService.isStartAlarm)
-                Toast.makeText(this, "Тревога уже отправлена", Toast.LENGTH_LONG).show()
-            else
-            {
-
                 if(preference.stationary=="0"){
                     presenter.sendMobileAlarm()
                     if(!NetworkService.isHaveCoordinate)
@@ -102,7 +88,6 @@ class MainActivity : MvpAppCompatActivity(),MainView {
                             .setMessage("Система пробует определить ваше месторасположение...")
                             .setPositiveButton("Отмена"){ dialog, which ->
                                 dialog.cancel()
-                                NetworkService.isStartAlarm = false
                             }
                             .setCancelable(false)
                             .create()
@@ -127,17 +112,10 @@ class MainActivity : MvpAppCompatActivity(),MainView {
                         cancelAlarm.visibility = View.GONE
                         alarmButton.visibility = View.VISIBLE }, 30000)
                 }
-
-
-            }
             true
         }
         cancelAlarm.setOnClickListener {
             if(preference.stationary=="0"){
-                if(!NetworkService.isStartAlarm) {
-                    Toast.makeText(this, "Тревога еще не началась", Toast.LENGTH_LONG).show()
-                    return@setOnClickListener
-                }
                 val view:View =  layoutInflater.inflate(R.layout.dialog_cancle_alarm, null)
                 val codeTextView:TextInputEditText = view.findViewById(R.id.cancelCodeEditText)
                 val sendCancel: Button = view.findViewById(R.id.sendCancelButton)
@@ -152,7 +130,6 @@ class MainActivity : MvpAppCompatActivity(),MainView {
                         codeTextView.error = "Поле не должбно быть пустым"
                         return@setOnClickListener
                     }
-
                     Log.d("Password", code)
                     presenter.sendCancel(code)
                 }
@@ -205,9 +182,9 @@ class MainActivity : MvpAppCompatActivity(),MainView {
 
         val preference = PrefsUtils(this)
         if(preference.stationary == "0")
-            supportActionBar?.title = "Мобильная"
+            supportActionBar?.title = "Мобильная v.${BuildConfig.VERSION_NAME}"
         else
-            supportActionBar?.title="Стационарная"
+            supportActionBar?.title="Стационарная v.${BuildConfig.VERSION_NAME}"
 
     }
 
@@ -296,6 +273,19 @@ class MainActivity : MvpAppCompatActivity(),MainView {
                 .setPositiveButton("Перепроверить баланс"){ dialog, which ->
                     dialog.cancel()
                     presenter.checkConnection()
+                }
+                .create().show()
+        }
+    }
+
+    override fun connectDialog() {
+        runOnUiThread {
+            AlertDialog.Builder(this)
+                .setTitle("Проверка соединения")
+                .setMessage("Соединение с сервером установлено")
+                .setCancelable(true)
+                .setPositiveButton("Ок"){ dialog, which ->
+                    dialog.cancel()
                 }
                 .create().show()
         }

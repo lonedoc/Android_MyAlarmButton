@@ -38,6 +38,17 @@ class LoginActivity:MvpAppCompatActivity(),LoginView,RegistrationCallback {
         setContentView(R.layout.activity_login)
 
 
+        val dialog = androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("Предупреждение!")
+            .setMessage("Данное приложение использует данные о вашем месторасположение в фоновом режиме(background)")
+            .setPositiveButton("Закрыть"){ dialog, which ->
+                checkPermission()
+                dialog.cancel()
+            }
+            .setCancelable(false)
+            .create()
+        dialog.show()
+
         passwordRequest.setOnClickListener { presenter.passwordRequest(phoneEditText.text.toString()) }
 
         phoneEditText.setOnTextChanged { str -> presenter.validatePhone(str.toString()) }

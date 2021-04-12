@@ -15,7 +15,7 @@ class PrefsUtils(context:Context): Preferences {
     override var serverAddress: ArrayList<String>
         get() {
             val arrayList: ArrayList<String> = ArrayList()
-            val string = prefs.getString("ip", "")
+            val string = prefs.getString("ips", "")
             for (w in string?.split(", ")!!) {
                 if (w.isNotEmpty()) {
                     arrayList.add(w)
@@ -25,7 +25,7 @@ class PrefsUtils(context:Context): Preferences {
         }
         set(value) {
             val editor = prefs.edit()
-            editor.putString("ip", value.joinToString { it }).apply()
+            editor.putString("ips", value.joinToString { it }).apply()
         }
 
     override var serverPort: Int
@@ -59,6 +59,12 @@ class PrefsUtils(context:Context): Preferences {
             val editor = prefs.edit()
             editor.putString("patrol", value).apply()
         }
+    override var version: String?
+        get() = prefs.getString("version", null)
+        set(value) {
+            val editor = prefs.edit()
+            editor.putString("version", value).apply()
+        }
 
 
     override var phone:String?
@@ -77,14 +83,13 @@ class PrefsUtils(context:Context): Preferences {
 
 
     override val containsAddress: Boolean
-        get() = prefs.contains("ip")
+        get() = prefs.contains("ips")
 
     override val containsPort: Boolean
         get() = prefs.contains("port")
 
     override val containsToken: Boolean
         get() = prefs.contains("token")
-
 
     override val containsFcmToken: Boolean
         get() = prefs.contains("fcmtoken")
@@ -94,6 +99,8 @@ class PrefsUtils(context:Context): Preferences {
         get() = prefs.contains("patrol")
     override val containsCompanyPhone: Boolean
         get() = prefs.contains("companyPhone")
+    override val containsVersion: Boolean
+        get() = prefs.contains("version")
 
     override val containsPhone:Boolean
         get() = prefs.contains("phone")

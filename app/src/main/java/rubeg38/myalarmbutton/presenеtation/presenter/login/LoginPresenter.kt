@@ -37,7 +37,7 @@ class LoginPresenter: OnAuthListener,OnPasswordListener,MvpPresenter<LoginView>(
                 else ->{
                     val cities = Gson().fromJson(serverResponse,Cities::class.java)
                     viewState.initSpinnerTown(cities!!.cityList)
-                    viewState.checkPermission()
+
                 }
             }
 
