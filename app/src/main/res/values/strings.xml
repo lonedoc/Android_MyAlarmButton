@@ -8,6 +8,8 @@
     <string name="roll_up">Свернуть</string>
     <string name="check_it">Проверка</string>
     <string name="phonebutton">PhoneButton</string>
+    <string name="gps_network_not_enabled">Приложение не работает без GPS. Включите GPS для продолжения работы</string>
+    <string name="open_location_settings">Открыть настройки</string>
 
 
 </resources>

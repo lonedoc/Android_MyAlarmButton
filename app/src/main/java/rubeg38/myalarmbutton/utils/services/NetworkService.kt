@@ -52,10 +52,10 @@ class NetworkService: Service(),ConnectionWatcher,LocationListener{
     private var cancelAlarm:CancelAPI? = null
     private var connectionLost = false
     private var isStartAlarm = false
-    private var isStarted = false
 
     companion object{
         var isHaveCoordinate = false
+        var isStarted = false
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -72,10 +72,16 @@ class NetworkService: Service(),ConnectionWatcher,LocationListener{
     }
 
     @SuppressLint("MissingPermission")
-    @Subscribe(threadMode = ThreadMode.BACKGROUND,sticky = true)
+    @Subscribe(threadMode = ThreadMode.MAIN,sticky = true)
     fun startAlarm(event:AlarmState){
         isStartAlarm = when(event.state){
             true ->{
+                val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
+                if(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)!=null)
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,1000,0F,this)
+                if(locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)!=null)
+                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,1000,0f,this)
                 true
             }
             false->{
@@ -127,15 +133,11 @@ class NetworkService: Service(),ConnectionWatcher,LocationListener{
         connectionAPI?.sendConnectionCheckedRequest {  }
 
         val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        if (locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER) != null)
-        {
+
+        if(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)!=null)
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,1000,0F,this)
-        }
-        else
-            if(locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER) != null)
-            {
-                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,1000,0F,this)
-            }
+        if(locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)!=null)
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,1000,0f,this)
 
         isStarted = true
 
@@ -289,8 +291,7 @@ class NetworkService: Service(),ConnectionWatcher,LocationListener{
         lon = df.format(location.longitude)
         speed = (location.speed * 3.6).toInt()
         accuracy = location.accuracy
-
-
+        Log.d("Coordinate","Yes")
         while (coordinateBuffer.isNotEmpty() && protocol.isConnected && isStartAlarm)
         {
             val lastIndex = coordinateBuffer.lastIndex
@@ -298,10 +299,6 @@ class NetworkService: Service(),ConnectionWatcher,LocationListener{
             isHaveCoordinate = true
             coordinateAPI?.sendCoordinateRequest(coordinate.lat,coordinate.lon,coordinate.speed,coordinate.accuracy)
         }
-
-        if(oldSpeed == speed && speed == 0) return
-
-        oldSpeed = speed
 
         if(protocol.token==null || !isStartAlarm)
         {
