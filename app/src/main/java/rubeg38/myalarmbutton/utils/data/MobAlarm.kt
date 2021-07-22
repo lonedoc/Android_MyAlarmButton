@@ -5,5 +5,6 @@ import com.google.gson.annotations.SerializedName
 data class MobAlarm(
     @SerializedName("\$c$") val command:String,
     val result:String?,
-    val gbr:String?
+    val gbr:String?,
+    val test:String?
 )

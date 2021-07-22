@@ -47,7 +47,7 @@ class MainActivity : MvpAppCompatActivity(),MainView {
 
         setSupportActionBar(mainToolbar)
 
-        presenter.checkConnection()
+        //presenter.checkConnection()
 
         val access = true
 
@@ -338,6 +338,19 @@ class MainActivity : MvpAppCompatActivity(),MainView {
             AlertDialog.Builder(this)
                 .setTitle("Проверка соединения")
                 .setMessage("Соединение с сервером установлено")
+                .setCancelable(true)
+                .setPositiveButton("Ок"){ dialog, which ->
+                    dialog.cancel()
+                }
+                .create().show()
+        }
+    }
+
+    override fun openTestDialog() {
+        runOnUiThread {
+            AlertDialog.Builder(this)
+                .setTitle("Проверка ТК")
+                .setMessage("Тревожная кнопка работает")
                 .setCancelable(true)
                 .setPositiveButton("Ок"){ dialog, which ->
                     dialog.cancel()

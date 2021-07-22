@@ -13,7 +13,7 @@ class RPCoordinateAPI(
 ):CoordinateAPI {
 
     override var onCoordinateListener: OnCoordinateListener? = null
-    override fun sendCoordinateRequest(lat: String, lon: String, speed: Int, accuracy: Float) {
+    override fun sendCoordinateRequest(lat: Float, lon: Float, speed: Int, accuracy: Float) {
         val message = JSONObject()
         message.put("\$c$", "mobalarm")
         message.put("id", "879A8884-1D0C-444F-8003-765A747B5C76")
@@ -21,8 +21,16 @@ class RPCoordinateAPI(
         message.put("accuracy",accuracy)
         message.put("lat", lat)
         message.put("lon", lon)
+        message.put("test",0)
+        protocol.send(message.toString()){
+        }
+    }
+    override fun sendStationaryRequest(test:Int) {
+        val message = JSONObject()
+        message.put("\$c$", "mobalarm")
+        message.put("id", "879A8884-1D0C-444F-8003-765A747B5C76")
+        message.put("test",test.toString())
 
-        Log.d("Coordinate",message.toString())
         protocol.send(message.toString()){
         }
     }
@@ -31,9 +39,15 @@ class RPCoordinateAPI(
 
 
     override fun onTextMessageReceived(message: String) {
+        Log.d("Test","$message")
         if(JSONObject(message).getString("\$c$") != "mobalarm") return
         val gson = Gson()
         val mobalarm = gson.fromJson(message, MobAlarm::class.java)
+
+        if(mobalarm.test!=null){
+            onCoordinateListener?.onCoordinateListener("test")
+            return
+        }
 
         if(mobalarm.result != null)
             onCoordinateListener?.onCoordinateListener(mobalarm.result)

@@ -28,6 +28,7 @@ class MainPresenter:MvpPresenter<MainView>(),OnCoordinateListener,OnCancelListen
             "ok"->{ viewState.changeButton()}
             "gbr"->{viewState.gbrLeft()}
             "tokennotreg"->{viewState.openLoginActivity()}
+            "test"->{viewState.openTestDialog()}
         }
     }
 
@@ -80,7 +81,7 @@ class MainPresenter:MvpPresenter<MainView>(),OnCoordinateListener,OnCancelListen
     }
 
     fun checkConnection() {
-        connectionAPI?.sendConnectionCheckedRequest {  }
+        coordinateAPI?.sendStationaryRequest(1)
     }
 
     override fun onConnectionListener(message: String) {
@@ -91,6 +92,6 @@ class MainPresenter:MvpPresenter<MainView>(),OnCoordinateListener,OnCancelListen
     }
 
     fun sendStationaryAlarm() {
-        coordinateAPI?.sendCoordinateRequest("","",0,0f)
+        coordinateAPI?.sendStationaryRequest(0)
     }
 }

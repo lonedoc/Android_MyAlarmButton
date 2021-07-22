@@ -19,4 +19,6 @@ interface MainView:MvpView {
     fun blockDialog(message: String)
     @StateStrategyType(value = SkipStrategy::class)
     fun connectDialog()
+    @StateStrategyType(value = SkipStrategy::class)
+    fun openTestDialog()
 }

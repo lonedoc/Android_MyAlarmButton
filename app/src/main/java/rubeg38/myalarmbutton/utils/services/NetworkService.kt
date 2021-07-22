@@ -287,17 +287,16 @@ class NetworkService: Service(),ConnectionWatcher,LocationListener{
     )
     override fun onLocationChanged(location: Location) {
         val df = DecimalFormat("#.######")
-        lat = df.format(location.latitude)
-        lon = df.format(location.longitude)
+        lat = df.format(location.latitude).replace(",",".")
+        lon = df.format(location.longitude).replace(",",".")
         speed = (location.speed * 3.6).toInt()
         accuracy = location.accuracy
-        Log.d("Coordinate","Yes")
         while (coordinateBuffer.isNotEmpty() && protocol.isConnected && isStartAlarm)
         {
             val lastIndex = coordinateBuffer.lastIndex
             val coordinate = coordinateBuffer.removeAt(lastIndex)
             isHaveCoordinate = true
-            coordinateAPI?.sendCoordinateRequest(coordinate.lat,coordinate.lon,coordinate.speed,coordinate.accuracy)
+            coordinateAPI?.sendCoordinateRequest(coordinate.lat.toFloat(),coordinate.lon.toFloat(),coordinate.speed,coordinate.accuracy)
         }
 
         if(protocol.token==null || !isStartAlarm)
@@ -314,7 +313,7 @@ class NetworkService: Service(),ConnectionWatcher,LocationListener{
             return
         }
 
-        coordinateAPI?.sendCoordinateRequest(lat!!,lon!!,speed!!,accuracy!!)
+        coordinateAPI?.sendCoordinateRequest(lat!!.toFloat(),lon!!.toFloat(),speed!!,accuracy!!)
     }
 
 
