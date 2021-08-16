@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/linearLayout"
@@ -17,10 +18,37 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:popupTheme="@style/PopupToolbarNormal" />
+        app:popupTheme="@style/PopupToolbarNormal"
+        android:elevation="2dp"/>
 
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/modeTabs"
+        app:layout_constraintTop_toBottomOf="@id/mainToolbar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        app:tabTextColor="@color/tab_text_color"
+        app:tabIndicatorColor="@android:color/white"
+        app:tabIndicatorHeight="2dp"
+        android:elevation="2dp">
 
-    <LinearLayout
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/alarmTab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/alarm_tab_text" />
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/patrolTab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/patrol_tab_text" />
+
+    </com.google.android.material.tabs.TabLayout>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/linearLayout2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -36,13 +64,21 @@
             android:background="@drawable/alarm_button" />
 
         <Button
-            android:id="@+id/cancelAlarm"
+            android:id="@+id/cancelButton"
             android:layout_width="250dp"
             android:layout_height="250dp"
             android:background="@drawable/alarm_button_cancel"
             android:textSize="24sp"
             android:visibility="gone" />
-    </LinearLayout>
+
+        <Button
+            android:id="@+id/patrolButton"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
+            android:background="@drawable/patrol_button"
+            android:visibility="gone" />
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
     <LinearLayout
         android:id="@+id/linearLayout3"
@@ -73,7 +109,7 @@
 
             <Button
                 android:id="@+id/check_it"
-                android:layout_width="wrap_content"
+                android:layout_width="120dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="32dp"
@@ -85,8 +121,22 @@
                 android:textSize="14sp" />
 
             <Button
+                android:id="@+id/callButton"
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="32dp"
+                android:backgroundTint="@color/color_status_button"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="@string/call_button_text"
+                android:textColor="@color/colorTextWhite"
+                android:textSize="14sp"
+                android:visibility="gone" />
+
+            <Button
                 android:id="@+id/roll_up"
-                android:layout_width="wrap_content"
+                android:layout_width="120dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="32dp"
                 android:layout_marginEnd="20dp"
@@ -96,7 +146,9 @@
                 android:text="@string/roll_up"
                 android:textColor="@color/colorTextWhite"
                 android:textSize="14sp" />
+
         </LinearLayout>
+
     </LinearLayout>
 
 

@@ -171,7 +171,7 @@ class LoginPresenter: OnAuthListener,OnPasswordListener,MvpPresenter<LoginView>(
         preferences?.token = message.token
         preferences?.companyPhone = message.phone
         preferences?.stationary = message.stationary
-        preferences?.patrol = message.patrol
+        preferences?.patrol = message.patrol != 0
         preferences?.serverAddress = ipList
         preferences?.serverPort = 9010
 

@@ -52,6 +52,7 @@ class NetworkService: Service(),ConnectionWatcher,LocationListener{
     private var cancelAlarm:CancelAPI? = null
     private var connectionLost = false
     private var isStartAlarm = false
+    private var sendingCheckpoint = false
 
     companion object{
         var isHaveCoordinate = false
@@ -96,6 +97,21 @@ class NetworkService: Service(),ConnectionWatcher,LocationListener{
         val state:Boolean,
         val code:String
     )
+
+    data class CheckpointEvent(val state: Boolean)
+
+    @SuppressLint("MissingPermission")
+    @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
+    fun sendCheckpoint(event: CheckpointEvent) {
+        sendingCheckpoint = true
+
+        val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
+        if(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)!=null)
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,1000,0F,this)
+        if(locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)!=null)
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,1000,0f,this)
+    }
 
     @SuppressLint("MissingPermission")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -291,12 +307,21 @@ class NetworkService: Service(),ConnectionWatcher,LocationListener{
         lon = df.format(location.longitude).replace(",",".")
         speed = (location.speed * 3.6).toInt()
         accuracy = location.accuracy
+
+        if (protocol.isConnected && sendingCheckpoint) {
+            val latitude = lat?.toFloatOrNull() ?: 0.0f
+            val longitude = lon?.toFloatOrNull() ?: 0.0f
+
+            coordinateAPI?.sendCoordinateRequest(latitude, longitude, speed, accuracy ?: 0.0f, true)
+            sendingCheckpoint = false
+        }
+
         while (coordinateBuffer.isNotEmpty() && protocol.isConnected && isStartAlarm)
         {
             val lastIndex = coordinateBuffer.lastIndex
             val coordinate = coordinateBuffer.removeAt(lastIndex)
             isHaveCoordinate = true
-            coordinateAPI?.sendCoordinateRequest(coordinate.lat.toFloat(),coordinate.lon.toFloat(),coordinate.speed,coordinate.accuracy)
+            coordinateAPI?.sendCoordinateRequest(coordinate.lat.toFloat(),coordinate.lon.toFloat(),coordinate.speed,coordinate.accuracy, false)
         }
 
         if(protocol.token==null || !isStartAlarm)
@@ -313,7 +338,7 @@ class NetworkService: Service(),ConnectionWatcher,LocationListener{
             return
         }
 
-        coordinateAPI?.sendCoordinateRequest(lat!!.toFloat(),lon!!.toFloat(),speed!!,accuracy!!)
+        coordinateAPI?.sendCoordinateRequest(lat!!.toFloat(),lon!!.toFloat(),speed!!,accuracy!!, false)
     }
 
 

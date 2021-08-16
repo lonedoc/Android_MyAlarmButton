@@ -1,7 +1,6 @@
 package rubeg38.myalarmbutton.ui.main
 
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.location.LocationManager
 import android.net.Uri
@@ -14,11 +13,11 @@ import android.view.View
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import com.google.android.material.tabs.TabLayout
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.android.synthetic.main.activity_main.*
 import moxy.MvpAppCompatActivity
 import moxy.presenter.InjectPresenter
-import org.greenrobot.eventbus.EventBus
 import org.json.JSONObject
 import rubeg38.myalarmbutton.BuildConfig
 import rubeg38.myalarmbutton.R
@@ -104,7 +103,7 @@ class MainActivity : MvpAppCompatActivity(),MainView {
                     {
                         presenter.sendStationaryAlarm()
                         alarmButton.postDelayed({
-                            cancelAlarm.visibility = View.GONE
+                            cancelButton.visibility = View.GONE
                             alarmButton.visibility = View.VISIBLE
                         }, 30000)
                     }
@@ -119,6 +118,12 @@ class MainActivity : MvpAppCompatActivity(),MainView {
             startActivity(callIntent)
         }
 
+        callButton.setOnClickListener {
+            val number: Uri = Uri.parse("tel:${preference.companyPhone}")
+            val callIntent = Intent(Intent.ACTION_DIAL, number)
+            startActivity(callIntent)
+        }
+
         roll_up.setOnClickListener {
             val startMain = Intent(Intent.ACTION_MAIN)
             startMain.addCategory(Intent.CATEGORY_HOME)
@@ -126,6 +131,8 @@ class MainActivity : MvpAppCompatActivity(),MainView {
             startActivity(startMain)
 
         }
+
+
 
         check_it.setOnClickListener {
             presenter.checkConnection()
@@ -138,7 +145,7 @@ class MainActivity : MvpAppCompatActivity(),MainView {
            check_it.postDelayed({ check_it.isEnabled = true }, 10000)
         }
 
-        cancelAlarm.setOnClickListener {
+        cancelButton.setOnClickListener {
             if(preference.stationary=="0"){
                 val view:View =  layoutInflater.inflate(R.layout.dialog_cancle_alarm, null)
                 val codeTextView:TextInputEditText = view.findViewById(R.id.cancelCodeEditText)
@@ -165,6 +172,31 @@ class MainActivity : MvpAppCompatActivity(),MainView {
             }
 
         }
+
+        setupViews()
+    }
+
+    private fun setupViews() {
+        val patrolModeAvailable = preference.patrol
+        if (patrolModeAvailable == null || !patrolModeAvailable) {
+            modeTabs.visibility = View.GONE
+        }
+
+        patrolButton.setOnClickListener {
+            presenter.sendCheckpoint()
+        }
+
+        modeTabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener{
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                when (modeTabs.selectedTabPosition) {
+                    0 -> presenter.alarmTabSelected()
+                    1 -> presenter.patrolTabSelected()
+                }
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) { }
+            override fun onTabReselected(tab: TabLayout.Tab?) { }
+        })
     }
 
     override fun onStart() {
@@ -249,15 +281,47 @@ class MainActivity : MvpAppCompatActivity(),MainView {
         exitProcess(0)
     }
 
+    override fun setTabsHidden(hidden: Boolean) {
+        runOnUiThread {
+            modeTabs.visibility = if (hidden) View.GONE else View.VISIBLE
+        }
+    }
+
+    override fun setPatrolMode(patrolMode: Boolean) {
+        runOnUiThread {
+            if (patrolMode) {
+                if (cancelButton.visibility == View.VISIBLE) {
+                    return@runOnUiThread
+                }
+
+                alarmButton.visibility = View.GONE
+                phoneButton.visibility = View.GONE
+                check_it.visibility = View.GONE
+
+                patrolButton.visibility = View.VISIBLE
+                callButton.visibility = View.VISIBLE
+
+                return@runOnUiThread
+            }
+
+            patrolButton.visibility = View.GONE
+            callButton.visibility = View.GONE
+
+            alarmButton.visibility = View.VISIBLE
+            phoneButton.visibility = View.VISIBLE
+            check_it.visibility = View.VISIBLE
+        }
+    }
+
     override fun changeButton() {
         runOnUiThread {
-            if(cancelAlarm.visibility == View.VISIBLE) return@runOnUiThread
+            if(cancelButton.visibility == View.VISIBLE) return@runOnUiThread
             Toast.makeText(
                 this,
                 "Тревога отправлена, ожидаем отправку ГБР, пожалуйста, не выключайте приложение",
                 Toast.LENGTH_LONG
             ).show()
-            cancelAlarm.visibility = View.VISIBLE
+            cancelButton.visibility = View.VISIBLE
             alarmButton.visibility = View.GONE
         }
     }
@@ -275,12 +339,18 @@ class MainActivity : MvpAppCompatActivity(),MainView {
 
     }
 
+    override fun showMessage(message: String) {
+        runOnUiThread {
+            Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+        }
+    }
+
     override fun cancelDialog() {
         runOnUiThread {
             val preference = PrefsUtils(this)
             if(preference.stationary == "0") {
                 Toast.makeText(this, "Тревога завершена", Toast.LENGTH_LONG).show()
-                cancelAlarm.visibility = View.GONE
+                cancelButton.visibility = View.GONE
                 alarmButton.visibility = View.VISIBLE
                 if(dialog.isShowing)
                     dialog.cancel()
@@ -288,7 +358,7 @@ class MainActivity : MvpAppCompatActivity(),MainView {
             else
             {
                 Toast.makeText(this, "Тревога завершена", Toast.LENGTH_LONG).show()
-                cancelAlarm.visibility = View.GONE
+                cancelButton.visibility = View.GONE
                 alarmButton.visibility = View.VISIBLE
             }
 

@@ -53,11 +53,11 @@ class PrefsUtils(context:Context): Preferences {
             val editor = prefs.edit()
             editor.putString("stationary", value).apply()
         }
-    override var patrol: String?
-        get() = prefs.getString("patrol", "0")
+    override var patrol: Boolean?
+        get() = prefs.getBoolean("patrol", false)
         set(value) {
             val editor = prefs.edit()
-            editor.putString("patrol", value).apply()
+            editor.putBoolean("patrol", value ?: false).apply()
         }
     override var version: String?
         get() = prefs.getString("version", null)

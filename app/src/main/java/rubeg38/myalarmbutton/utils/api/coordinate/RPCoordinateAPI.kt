@@ -13,7 +13,7 @@ class RPCoordinateAPI(
 ):CoordinateAPI {
 
     override var onCoordinateListener: OnCoordinateListener? = null
-    override fun sendCoordinateRequest(lat: Float, lon: Float, speed: Int, accuracy: Float) {
+    override fun sendCoordinateRequest(lat: Float, lon: Float, speed: Int, accuracy: Float, patrol: Boolean) {
         val message = JSONObject()
         message.put("\$c$", "mobalarm")
         message.put("id", "879A8884-1D0C-444F-8003-765A747B5C76")
@@ -22,6 +22,11 @@ class RPCoordinateAPI(
         message.put("lat", lat)
         message.put("lon", lon)
         message.put("test",0)
+
+        if (patrol) {
+            message.put("patrol", 1)
+        }
+
         protocol.send(message.toString()){
         }
     }

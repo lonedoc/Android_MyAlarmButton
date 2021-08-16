@@ -5,6 +5,6 @@ import rubeg38.myalarmbutton.utils.interfaces.DestroyableAPI
 
 interface CoordinateAPI:TextMessageWatcher,DestroyableAPI {
     var onCoordinateListener:OnCoordinateListener?
-    fun sendCoordinateRequest(lat:Float,lon:Float,speed:Int,accuracy:Float)
+    fun sendCoordinateRequest(lat:Float,lon:Float,speed:Int,accuracy:Float, patrol: Boolean)
     fun sendStationaryRequest(test:Int)
 }

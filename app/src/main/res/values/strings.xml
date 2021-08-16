@@ -10,6 +10,9 @@
     <string name="phonebutton">PhoneButton</string>
     <string name="gps_network_not_enabled">Приложение не работает без GPS. Включите GPS для продолжения работы</string>
     <string name="open_location_settings">Открыть настройки</string>
+    <string name="alarm_tab_text">Тревога</string>
+    <string name="patrol_tab_text">Патруль</string>
+    <string name="call_button_text">Звонок</string>
 
 
 </resources>

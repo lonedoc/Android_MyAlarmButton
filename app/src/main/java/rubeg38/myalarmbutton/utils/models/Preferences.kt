@@ -8,7 +8,7 @@ interface Preferences {
     var fcmtoken: String?
     var companyPhone:String?
     var stationary:String?
-    var patrol:String?
+    var patrol:Boolean?
     var version:String?
 
     val containsPhone:Boolean

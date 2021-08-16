@@ -1,5 +1,6 @@
 package rubeg38.myalarmbutton.presenеtation.presenter.main
 
+import android.net.Network
 import moxy.InjectViewState
 import moxy.MvpPresenter
 import org.greenrobot.eventbus.EventBus
@@ -13,6 +14,7 @@ import rubeg38.myalarmbutton.utils.api.checkConnection.RPConnectionAPI
 import rubeg38.myalarmbutton.utils.api.coordinate.CoordinateAPI
 import rubeg38.myalarmbutton.utils.api.coordinate.OnCoordinateListener
 import rubeg38.myalarmbutton.utils.api.coordinate.RPCoordinateAPI
+import rubeg38.myalarmbutton.utils.data.MainScreenState
 import rubeg38.myalarmbutton.utils.services.NetworkService
 import rubegprotocol.RubegProtocol
 
@@ -22,10 +24,18 @@ class MainPresenter:MvpPresenter<MainView>(),OnCoordinateListener,OnCancelListen
     private var coordinateAPI:CoordinateAPI? = null
     private var cancelAPI:CancelAPI? = null
     private var connectionAPI:ConnectionAPI? = null
+    private var sendingCheckpoint: Boolean = false
 
     override fun onCoordinateListener(message: String) {
         when(message){
-            "ok"->{ viewState.changeButton()}
+            "ok"->{
+                if (sendingCheckpoint) {
+                    viewState.showMessage("Координаты доставлены")
+                    sendingCheckpoint = false
+                    return
+                }
+                viewState.changeButton()
+            }
             "gbr"->{viewState.gbrLeft()}
             "tokennotreg"->{viewState.openLoginActivity()}
             "test"->{viewState.openTestDialog()}
@@ -57,8 +67,22 @@ class MainPresenter:MvpPresenter<MainView>(),OnCoordinateListener,OnCancelListen
     fun sendCancel(code: String) {
         EventBus.getDefault().post(NetworkService.AlarmState(false,code))
     }
+
+    fun sendCheckpoint() {
+        sendingCheckpoint = true
+        EventBus.getDefault().post(NetworkService.CheckpointEvent(true))
+    }
+
     fun sendCancel(){
         cancelAPI?.sendCancelRequest("","","",0,0f)
+    }
+
+    fun alarmTabSelected() {
+        viewState.setPatrolMode(false)
+    }
+
+    fun patrolTabSelected() {
+        viewState.setPatrolMode(true)
     }
 
     override fun onDestroy() {
