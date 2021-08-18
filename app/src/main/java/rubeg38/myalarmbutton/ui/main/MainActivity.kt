@@ -4,7 +4,10 @@ import android.content.Context
 import android.content.Intent
 import android.location.LocationManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.provider.Settings
 import android.util.Log
 import android.view.Menu
@@ -69,6 +72,8 @@ class MainActivity : MvpAppCompatActivity(),MainView {
         checkGPSEnabled()
 
         alarmButton.setOnLongClickListener{
+            vibrate()
+
             if(!checkGPSEnabled()) return@setOnLongClickListener true
 
             thread {
@@ -113,18 +118,21 @@ class MainActivity : MvpAppCompatActivity(),MainView {
         }
 
         phoneButton.setOnClickListener {
+            vibrate()
             val number: Uri = Uri.parse("tel:${preference.companyPhone}")
             val callIntent = Intent(Intent.ACTION_DIAL, number)
             startActivity(callIntent)
         }
 
         callButton.setOnClickListener {
+            vibrate()
             val number: Uri = Uri.parse("tel:${preference.companyPhone}")
             val callIntent = Intent(Intent.ACTION_DIAL, number)
             startActivity(callIntent)
         }
 
         roll_up.setOnClickListener {
+            vibrate()
             val startMain = Intent(Intent.ACTION_MAIN)
             startMain.addCategory(Intent.CATEGORY_HOME)
             startMain.flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -135,6 +143,7 @@ class MainActivity : MvpAppCompatActivity(),MainView {
 
 
         check_it.setOnClickListener {
+            vibrate()
             presenter.checkConnection()
             if(!check_it.isEnabled)
             {
@@ -146,6 +155,7 @@ class MainActivity : MvpAppCompatActivity(),MainView {
         }
 
         cancelButton.setOnClickListener {
+            vibrate()
             if(preference.stationary=="0"){
                 val view:View =  layoutInflater.inflate(R.layout.dialog_cancle_alarm, null)
                 val codeTextView:TextInputEditText = view.findViewById(R.id.cancelCodeEditText)
@@ -183,6 +193,7 @@ class MainActivity : MvpAppCompatActivity(),MainView {
         }
 
         patrolButton.setOnClickListener {
+            vibrate()
             presenter.sendCheckpoint()
         }
 
@@ -426,6 +437,19 @@ class MainActivity : MvpAppCompatActivity(),MainView {
                     dialog.cancel()
                 }
                 .create().show()
+        }
+    }
+
+    private fun vibrate() {
+        runOnUiThread {
+            val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val vibrationEffect = VibrationEffect.createOneShot(250, VibrationEffect.DEFAULT_AMPLITUDE)
+                vibrator.vibrate(vibrationEffect)
+            } else {
+                vibrator.vibrate(250)
+            }
         }
     }
 
