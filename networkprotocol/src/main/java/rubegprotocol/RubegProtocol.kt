@@ -275,7 +275,7 @@ class RubegProtocol {
                     ContentType.ACKNOWLEDGEMENT -> {
                         handleAcknowledgement(packet as AcknowledgementPacket)
                     }
-                    ContentType.BINARY, ContentType.STRING -> {
+                    ContentType.BINARY, ContentType.STRING, ContentType.NOCONNECTION -> {
                         handleData(packet as DataPacket)
                     }
                     else -> {
@@ -419,7 +419,6 @@ class RubegProtocol {
     }
 
     private fun handleData(packet: DataPacket) {
-
         val messageNumber = packet.headers.messageNumber
 
         if(packet.headers.sessionId != null)
@@ -449,7 +448,7 @@ class RubegProtocol {
 
             if (transmission.done) {
                 when (packet.headers.contentType) {
-                    ContentType.STRING -> {
+                    ContentType.STRING, ContentType.NOCONNECTION -> {
                         val message = String(transmission.message!!)
                         textMessageWatchers.forEach { it?.onTextMessageReceived(message) }
                     }

@@ -1,5 +1,6 @@
 package rubeg38.myalarmbutton.presenеtation.view.main
 
+import com.google.android.material.circularreveal.CircularRevealHelper
 import moxy.MvpView
 import moxy.viewstate.strategy.SkipStrategy
 import moxy.viewstate.strategy.StateStrategyType
@@ -29,4 +30,10 @@ interface MainView:MvpView {
     fun setPatrolMode(patrolMode: Boolean)
     @Skip
     fun showMessage(message: String)
+    @Skip
+    fun saveLogo(data: ByteArray)
+    @AddToEndSingle
+    fun loadCompanyLogo()
+    @AddToEndSingle
+    fun hideSplashScreen()
 }

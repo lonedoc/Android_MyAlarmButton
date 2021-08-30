@@ -1,7 +1,11 @@
 package rubeg38.myalarmbutton.ui.main
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.location.LocationManager
 import android.net.Uri
 import android.os.Build
@@ -9,13 +13,16 @@ import android.os.Bundle
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.provider.Settings
+import android.util.Base64
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import com.bumptech.glide.Glide
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.android.synthetic.main.activity_main.*
@@ -29,16 +36,21 @@ import rubeg38.myalarmbutton.presenеtation.view.main.MainView
 import rubeg38.myalarmbutton.ui.login.LoginActivity
 import rubeg38.myalarmbutton.utils.PrefsUtils
 import rubeg38.myalarmbutton.utils.services.NetworkService
+import java.io.*
 import java.lang.Thread.sleep
+import java.util.*
 import kotlin.concurrent.thread
 import kotlin.system.exitProcess
 
+private val logoFilename = "company_logo.jpg"
 
 class MainActivity : MvpAppCompatActivity(),MainView {
     @InjectPresenter
     lateinit var presenter:MainPresenter
 
     lateinit var dialog:AlertDialog
+
+    private var timer: Timer? = null
 
     private val preference by lazy {
         PrefsUtils(this)
@@ -184,6 +196,91 @@ class MainActivity : MvpAppCompatActivity(),MainView {
         }
 
         setupViews()
+        loadCompanyLogo()
+        updateCompanyLogo()
+    }
+
+    override fun loadCompanyLogo() {
+        thread {
+            val data = getCompanyLogo()
+            val bitmap = BitmapFactory.decodeByteArray(data, 0, data.count())
+
+            runOnUiThread {
+                val logo = findViewById<ImageView>(R.id.companyLogo)
+                Glide.with(this).load(bitmap).into(logo)
+            }
+        }
+    }
+
+    private fun updateCompanyLogo() {
+        thread {
+            val data = getCompanyLogo()
+            val base64String = Base64.encodeToString(data, Int.MAX_VALUE)
+            presenter.updateCompanyLogo(base64String.count())
+        }
+    }
+
+    private fun getCompanyLogo(): ByteArray {
+        return try {
+            readCompanyLogo()
+        } catch (ex: FileNotFoundException) {
+            byteArrayOf()
+        }
+    }
+
+    private fun readCompanyLogo(): ByteArray {
+        val file = File(filesDir, logoFilename)
+        FileInputStream(file).use { inputStream ->
+            BufferedInputStream(inputStream).use { bufferedStream ->
+                return@readCompanyLogo bufferedStream.readBytes()
+            }
+        }
+    }
+
+    override fun hideSplashScreen() {
+        runOnUiThread {
+            val splashScreen = findViewById<View>(R.id.splashScreen)
+
+            splashScreen.animate()
+                .alpha(0f)
+                .setDuration(500)
+                .setListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator) {
+                        splashScreen.visibility = View.GONE
+                    }
+                })
+        }
+    }
+
+    override fun saveLogo(data: ByteArray) {
+        thread {
+            try {
+                writeLogoToFile(data)
+                loadCompanyLogo()
+            } catch (ex: Exception) {
+                ex.printStackTrace()
+            }
+        }
+    }
+
+    private fun writeLogoToFile(data: ByteArray) {
+        deleteLogoFile()
+
+        val file = File(filesDir, logoFilename)
+        FileOutputStream(file).use { outputStream ->
+            BufferedOutputStream(outputStream).use { stream ->
+                stream.write(data)
+                stream.flush()
+            }
+        }
+    }
+
+    private fun deleteLogoFile() {
+        val file = File(filesDir, logoFilename)
+
+        if (file.exists()) {
+            file.delete()
+        }
     }
 
     private fun setupViews() {
@@ -208,6 +305,18 @@ class MainActivity : MvpAppCompatActivity(),MainView {
             override fun onTabUnselected(tab: TabLayout.Tab?) { }
             override fun onTabReselected(tab: TabLayout.Tab?) { }
         })
+
+        timer?.cancel()
+        timer = Timer()
+
+        timer?.schedule(object : TimerTask() {
+            override fun run() {
+                runOnUiThread {
+                    hideSplashScreen()
+                }
+            }
+
+        }, 3500)
     }
 
     override fun onStart() {

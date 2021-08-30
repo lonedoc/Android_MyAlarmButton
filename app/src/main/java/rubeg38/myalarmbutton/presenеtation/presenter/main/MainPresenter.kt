@@ -1,6 +1,7 @@
 package rubeg38.myalarmbutton.presenеtation.presenter.main
 
-import android.net.Network
+import android.util.Base64
+import android.util.Log
 import moxy.InjectViewState
 import moxy.MvpPresenter
 import org.greenrobot.eventbus.EventBus
@@ -14,9 +15,11 @@ import rubeg38.myalarmbutton.utils.api.checkConnection.RPConnectionAPI
 import rubeg38.myalarmbutton.utils.api.coordinate.CoordinateAPI
 import rubeg38.myalarmbutton.utils.api.coordinate.OnCoordinateListener
 import rubeg38.myalarmbutton.utils.api.coordinate.RPCoordinateAPI
-import rubeg38.myalarmbutton.utils.data.MainScreenState
+import rubeg38.myalarmbutton.utils.api.logo.LogoAPI
+import rubeg38.myalarmbutton.utils.api.logo.RPLogoAPI
 import rubeg38.myalarmbutton.utils.services.NetworkService
 import rubegprotocol.RubegProtocol
+import java.io.File
 
 @InjectViewState
 class MainPresenter:MvpPresenter<MainView>(),OnCoordinateListener,OnCancelListener,OnConnectionListener{
@@ -24,6 +27,7 @@ class MainPresenter:MvpPresenter<MainView>(),OnCoordinateListener,OnCancelListen
     private var coordinateAPI:CoordinateAPI? = null
     private var cancelAPI:CancelAPI? = null
     private var connectionAPI:ConnectionAPI? = null
+    private var logoAPI: LogoAPI? = null
     private var sendingCheckpoint: Boolean = false
 
     override fun onCoordinateListener(message: String) {
@@ -57,6 +61,25 @@ class MainPresenter:MvpPresenter<MainView>(),OnCoordinateListener,OnCancelListen
         if(connectionAPI != null) connectionAPI?.onDestroy()
         connectionAPI = RPConnectionAPI(protocol)
         connectionAPI?.onConnectionListener = this
+
+        if (logoAPI != null) {
+            logoAPI?.onDestroy()
+        }
+
+        logoAPI = RPLogoAPI(protocol)
+        logoAPI?.onLogoFetched = callback@ { hasBeenChanged, base64 ->
+            if (!hasBeenChanged) {
+                return@callback
+            }
+
+            val data = Base64.decode(base64, Base64.DEFAULT)
+            viewState.saveLogo(data)
+        }
+    }
+
+    fun updateCompanyLogo(oldLogoSize: Int) {
+        Thread.sleep(500)
+        logoAPI?.sendLogoRequest(oldLogoSize) { }
     }
 
     fun sendMobileAlarm()
@@ -89,8 +112,8 @@ class MainPresenter:MvpPresenter<MainView>(),OnCoordinateListener,OnCancelListen
         cancelAPI?.onDestroy()
         coordinateAPI?.onDestroy()
         connectionAPI?.onDestroy()
+        logoAPI?.onDestroy()
         super.onDestroy()
-
     }
 
     override fun onCancelListener(message: String) {
