@@ -118,6 +118,7 @@ class MainActivity : MvpAppCompatActivity(),MainView {
                     }
                     else
                     {
+
                         presenter.sendStationaryAlarm()
                         alarmButton.postDelayed({
                             cancelButton.visibility = View.GONE
@@ -155,16 +156,58 @@ class MainActivity : MvpAppCompatActivity(),MainView {
 
 
         check_it.setOnClickListener {
-            vibrate()
-            presenter.checkConnection()
-            if(!check_it.isEnabled)
-            {
-                Toast.makeText(this, "Нельзя совершать проверку чаще 2-х минут", Toast.LENGTH_LONG).show()
-                return@setOnClickListener
+                vibrate()
+                thread {
+                    sleep(100)
+                    runOnUiThread {
+                        if(!NetworkService.isHaveCoordinateTest)
+                        {
+                            val dialog = AlertDialog.Builder(this)
+                                .setMessage("Система пробует определить ваше месторасположение...")
+                                .setPositiveButton("Отмена"){ dialog, which ->
+                                    dialog.cancel()
+                                }
+                                .setCancelable(false)
+                                .create()
+                            dialog.show()
+
+                            thread {
+                                while (!NetworkService.isHaveCoordinate)
+                                {
+                                    //
+                                }
+                                runOnUiThread {
+                                    dialog.cancel()
+                                    Toast.makeText(this,"Ваши координаты определены",Toast.LENGTH_SHORT).show()
+                                    presenter.checkConnection()
+                                    if(!check_it.isEnabled)
+                                    {
+                                        Toast.makeText(this, "Нельзя совершать проверку чаще 2-х минут", Toast.LENGTH_LONG).show()
+                                        return@runOnUiThread
+                                    }
+                                    check_it.isEnabled = false
+                                    check_it.postDelayed({ check_it.isEnabled = true }, 10000)
+                                }
+                            }
+
+                        }
+                        else{
+                            runOnUiThread {
+                                Toast.makeText(this,"Ваши координаты определены",Toast.LENGTH_SHORT).show()
+                                presenter.checkConnection()
+                                if(!check_it.isEnabled)
+                                {
+                                    Toast.makeText(this, "Нельзя совершать проверку чаще 2-х минут", Toast.LENGTH_LONG).show()
+                                    return@runOnUiThread
+                                }
+                                check_it.isEnabled = false
+                                check_it.postDelayed({ check_it.isEnabled = true }, 10000)
+                            }
+                        }
+                    }
+                }
+
             }
-            check_it.isEnabled = false
-           check_it.postDelayed({ check_it.isEnabled = true }, 10000)
-        }
 
         cancelButton.setOnClickListener {
             vibrate()

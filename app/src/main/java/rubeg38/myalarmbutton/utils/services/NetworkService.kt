@@ -56,6 +56,7 @@ class NetworkService: Service(),ConnectionWatcher,LocationListener{
 
     companion object{
         var isHaveCoordinate = false
+        var isHaveCoordinateTest = false
         var isStarted = false
     }
 
@@ -308,6 +309,7 @@ class NetworkService: Service(),ConnectionWatcher,LocationListener{
         speed = (location.speed * 3.6).toInt()
         accuracy = location.accuracy
 
+        isHaveCoordinateTest = true
         if (protocol.isConnected && sendingCheckpoint) {
             val latitude = lat?.toFloatOrNull() ?: 0.0f
             val longitude = lon?.toFloatOrNull() ?: 0.0f
